@@ -1,8 +1,9 @@
 fastapi
 uvicorn
 sqlalchemy
-psycopg2-binary
+psycopg[binary]
 jinja2
+jinja2-fragments
 python-multipart
 itsdangerous
 email-validator
@@ -11,4 +12,3 @@ qrcode[pil]
 python-dotenv
 pandas
 openpyxl
-psycopg[binary]
