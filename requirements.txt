@@ -11,3 +11,4 @@ qrcode[pil]
 python-dotenv
 pandas
 openpyxl
+psycopg[binary]
