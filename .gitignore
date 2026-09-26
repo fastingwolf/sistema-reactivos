@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+reactivos.db
+*.db
+reactivos.xlsx
+.env
+.env.*
+*.log
+.DS_Store

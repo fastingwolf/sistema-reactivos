@@ -3,8 +3,12 @@
 
 {% block contenido %}
 <h2>Panel de depósito</h2>
-
+<h3>Acciones rápidas</h3>
+<p>
+    <a href="/escaner">📷 Escanear código QR</a>
+</p>
 <h3>Solicitudes pendientes</h3>
+
 <table>
     <tr><th>ID</th><th>Estudiante</th><th>Reactivo</th><th>Cantidad</th><th>Laboratorio</th></tr>
     {% for s in pendientes %}

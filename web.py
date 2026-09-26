@@ -412,3 +412,51 @@ def procesar_escaneo(request: Request, codigo: str = Form(...), db: Session = De
         "contenedor": contenedor,
         "reactivo": contenedor.reactivo
     })
+@router.get("/escaner", response_class=HTMLResponse)
+def pagina_escaner(request: Request, db: Session = Depends(get_db)):
+    usuario = usuario_actual(request, db)
+    if not usuario:
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse("escaner.html", {
+        "request": request,
+        "usuario": usuario
+    })
+
+
+@router.get("/escaner", response_class=HTMLResponse)
+def pagina_escaner(request: Request, db: Session = Depends(get_db)):
+    usuario = usuario_actual(request, db)
+    if not usuario:
+        return RedirectResponse(url="/login", status_code=303)
+    if usuario.rol not in ("deposito", "admin"):
+        return RedirectResponse(url="/menu", status_code=303)
+    return templates.TemplateResponse("escaner.html", {
+        "request": request,
+        "usuario": usuario
+    })
+
+
+@router.post("/escaner/procesar", response_class=HTMLResponse)
+def procesar_escaneo(request: Request,
+                     codigo: str = Form(...),
+                     db: Session = Depends(get_db)):
+    usuario = usuario_actual(request, db)
+    if not usuario:
+        return RedirectResponse(url="/login", status_code=303)
+    if usuario.rol not in ("deposito", "admin"):
+        return RedirectResponse(url="/menu", status_code=303)
+
+    contenedor = buscar_contenedor_por_codigo(db, codigo)
+    if not contenedor:
+        return templates.TemplateResponse("escaner_resultado.html", {
+            "request": request,
+            "usuario": usuario,
+            "error": f"No se encontró el contenedor {codigo}"
+        })
+
+    return templates.TemplateResponse("escaner_resultado.html", {
+        "request": request,
+        "usuario": usuario,
+        "contenedor": contenedor,
+        "reactivo": contenedor.reactivo
+    })

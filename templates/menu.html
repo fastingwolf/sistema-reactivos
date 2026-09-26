@@ -6,6 +6,10 @@
 <p>Rol: <strong>{{ usuario.rol }}</strong></p>
 
 <ul>
+    {% if usuario.rol == "deposito" or usuario.rol == "admin" %}
+        <li><a href="/escaner">📷 Escanear código QR</a></li>
+    {% endif %}
+
     {% if usuario.rol == "docente" %}
         <li><a href="/docente">Panel de docente</a></li>
     {% elif usuario.rol == "estudiante" %}
@@ -13,6 +17,7 @@
     {% elif usuario.rol == "deposito" %}
         <li><a href="/deposito">Panel de depósito</a></li>
     {% endif %}
+
     <li><a href="/reactivos">Ver reactivos disponibles</a></li>
     <li><a href="/usuarios">Ver usuarios registrados</a></li>
 </ul>

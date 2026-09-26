@@ -1,31 +1,39 @@
-<!-- templates/escaner.html -->
 {% extends "base.html" %}
-
-{% block title %}Escanear Contenedor{% endblock %}
+{% block title %}Escanear QR{% endblock %}
 
 {% block contenido %}
-<h2>Escanear Código QR</h2>
-<div id="reader" style="width: 300px; margin: auto;"></div>
+<h2>Escanear código QR</h2>
+
+<p id="estado">Apunta la cámara al código QR del frasco.</p>
+
+<div id="reader" style="width: 100%; max-width: 500px; margin: 20px auto;"></div>
+
 <form id="form-escaneo" method="post" action="/escaner/procesar" style="display:none;">
     <input type="hidden" name="codigo" id="codigo-escaneado">
 </form>
-<p id="estado">Apunta la cámara al código QR del frasco.</p>
 
-<!-- Carga la librería de escaneo -->
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script>
-    function onScanSuccess(decodedText, decodedResult) {
-        // Detiene el escáner para no escanear varias veces
+    function onScanSuccess(decodedText) {
+        // Detiene el escáner
         html5QrcodeScanner.clear();
-        
-        // Muestra el código detectado y envía el formulario
         document.getElementById('estado').innerText = 'Código detectado: ' + decodedText;
+
+        // Envía el formulario automáticamente
         document.getElementById('codigo-escaneado').value = decodedText;
         document.getElementById('form-escaneo').submit();
     }
 
+    function onScanError(errorMessage) {
+        // Silencioso: no mostrar errores de escaneo continuos
+    }
+
     let html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader", { fps: 10, qrbox: 250 });
-    html5QrcodeScanner.render(onScanSuccess);
+        "reader",
+        { fps: 10, qrbox: 250 }
+    );
+    html5QrcodeScanner.render(onScanSuccess, onScanError);
 </script>
+
+<p><a href="/menu">← Volver al menú</a></p>
 {% endblock %}
