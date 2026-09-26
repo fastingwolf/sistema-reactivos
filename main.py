@@ -5,6 +5,7 @@ from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from typing import List
+from fastapi.responses import RedirectResponse
 
 from database import init_db, get_db, SessionLocal
 from auth import login, registrar_usuario
@@ -242,3 +243,9 @@ app.include_router(api)
 # Incluir las rutas de la interfaz web (sin prefijo)
 from web import router as web_router
 app.include_router(web_router)
+
+from fastapi.responses import RedirectResponse
+
+@app.get("/")
+def raiz():
+    return RedirectResponse(url="/login", status_code=303)

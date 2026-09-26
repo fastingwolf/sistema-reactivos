@@ -1,7 +1,7 @@
 {
   "functions": {
     "main.py": {
-      "maxDuration": 60
+      "includeFiles": "{templates/**,static/**}"
     }
   }
 }
