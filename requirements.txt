@@ -1,11 +1,13 @@
-sqlalchemy
-bcrypt==4.3.0
-qrcode[pil]
 fastapi
 uvicorn
-email-validator
+sqlalchemy
+psycopg2-binary
 jinja2
 python-multipart
 itsdangerous
+email-validator
+bcrypt==4.3.0
+qrcode[pil]
+python-dotenv
 pandas
 openpyxl
