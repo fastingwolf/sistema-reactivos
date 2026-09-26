@@ -1,11 +1,6 @@
 import io
 import qrcode
 from fastapi import Response
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent
-CARPETA_QR = BASE_DIR / "static" / "qr"
-CARPETA_QR.mkdir(parents=True, exist_ok=True)
 
 
 def generar_qr_png(contenido: str, tamaño: int = 300) -> bytes:
@@ -24,14 +19,6 @@ def generar_qr_png(contenido: str, tamaño: int = 300) -> bytes:
     img.save(buffer, format="PNG")
     buffer.seek(0)
     return buffer.getvalue()
-
-
-def guardar_qr_archivo(contenido: str, nombre_archivo: str) -> Path:
-    """Guarda el QR en static/qr/<nombre_archivo>.png y devuelve la ruta."""
-    ruta = CARPETA_QR / f"{nombre_archivo}.png"
-    datos = generar_qr_png(contenido)
-    ruta.write_bytes(datos)
-    return ruta
 
 
 def respuesta_qr(contenido: str) -> Response:
