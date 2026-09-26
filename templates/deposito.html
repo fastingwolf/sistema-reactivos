@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Panel depósito{% endblock %}
+
+{% block contenido %}
+<h2>Panel de depósito</h2>
+
+<h3>Solicitudes pendientes</h3>
+<table>
+    <tr><th>ID</th><th>Estudiante</th><th>Reactivo</th><th>Cantidad</th><th>Laboratorio</th></tr>
+    {% for s in pendientes %}
+    <tr>
+        <td>{{ s.id }}</td>
+        <td>{{ s.estudiante.nombre }}</td>
+        <td>{{ s.detalles[0].reactivo.nombre }}</td>
+        <td>{{ s.detalles[0].cantidad_solicitada }}</td>
+        <td>{{ s.laboratorio_destino }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3>Entregar solicitud</h3>
+<form method="post" action="/deposito/entregar">
+    <label>ID de solicitud</label>
+    <input type="number" name="solicitud_id" required>
+
+    <label>Código de barras del contenedor</label>
+    <input type="text" name="codigo_contenedor" required placeholder="CNT-XXXXXXXX">
+
+    <button type="submit">Entregar</button>
+</form>
+
+<p><a href="/menu">← Volver al menú</a></p>
+{% endblock %}

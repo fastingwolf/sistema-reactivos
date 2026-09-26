@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Panel estudiante{% endblock %}
+
+{% block contenido %}
+<h2>Panel de estudiante</h2>
+
+<h3>Nueva solicitud de reactivo</h3>
+<form method="post" action="/estudiante/solicitar">
+    <label>Reactivo (CAS)</label>
+    <select name="cas_reactivo" required>
+        {% for r in reactivos %}
+        <option value="{{ r.cas }}">{{ r.nombre }} ({{ r.cas }})</option>
+        {% endfor %}
+    </select>
+
+    <label>Cantidad solicitada</label>
+    <input type="number" step="0.01" name="cantidad" required>
+
+    <label>Laboratorio destino</label>
+    <input type="text" name="laboratorio_destino" required>
+
+    <label>Código de autorización</label>
+    <input type="text" name="codigo_autorizacion" required placeholder="AUT-XXXX-XXXX">
+
+    <button type="submit">Crear solicitud</button>
+</form>
+
+<h3>Mis solicitudes</h3>
+
+{% if mensaje %}<div class="alerta alerta-exito">{{ mensaje }}</div>{% endif %}
+{% if error %}<div class="alerta alerta-error">{{ error }}</div>{% endif %}
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Reactivo</th>
+        <th>Cantidad</th>
+        <th>Laboratorio</th>
+        <th>Estado</th>
+    </tr>
+    {% for s in solicitudes %}
+    <tr>
+        <td>{{ s.id }}</td>
+        <td>{{ s.detalles[0].reactivo.nombre }}</td>
+        <td>{{ s.detalles[0].cantidad_solicitada }}</td>
+        <td>{{ s.laboratorio_destino }}</td>
+        <td>{{ s.estado }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

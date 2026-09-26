@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Panel docente{% endblock %}
+
+{% block contenido %}
+<h2>Panel de docente</h2>
+
+<h3>Generar código de autorización</h3>
+<form method="post" action="/docente/generar-codigo">
+    <label>Reactivo (CAS)</label>
+    <select name="cas_reactivo" required>
+        {% for r in reactivos %}
+        <option value="{{ r.cas }}">{{ r.nombre }} ({{ r.cas }})</option>
+        {% endfor %}
+    </select>
+
+    <label>Cantidad máxima</label>
+    <input type="number" step="0.01" name="cantidad_maxima" required>
+
+    <label>Vigencia (horas)</label>
+    <input type="number" name="horas_vigencia" value="24" required>
+
+    <label>Usos permitidos</label>
+    <input type="number" name="usos" value="1" required>
+
+    <label>Estudiante autorizado (opcional)</label>
+    <select name="correo_estudiante">
+        <option value="">— Cualquier estudiante —</option>
+        {% for e in estudiantes %}
+        <option value="{{ e.correo }}">{{ e.nombre }} ({{ e.correo }})</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Generar código</button>
+</form>
+
+{% if codigo_generado %}
+<div class="alerta alerta-exito">
+    Código generado: <span class="codigo">{{ codigo_generado }}</span>
+</div>
+{% endif %}
+
+<h3>Mis códigos generados</h3>
+<table>
+    <tr><th>Código</th><th>Reactivo</th><th>Cantidad</th><th>Estado</th></tr>
+    {% for c in codigos %}
+    <tr>
+        <td>{{ c.codigo }}</td>
+        <td>{{ c.reactivo.nombre }}</td>
+        <td>{{ c.cantidad_maxima }}</td>
+        <td>{{ c.estado }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p><a href="/menu">← Volver al menú</a></p>
+{% endblock %}

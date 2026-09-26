@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Sistema de Reactivos{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Reactivos</h1>
+        {% if usuario %}
+            <span>{{ usuario.nombre }} ({{ usuario.rol }})</span>
+            <a href="/logout">Salir</a>
+        {% endif %}
+    </header>
+
+    <main>
+ {% if mensaje %}
+        <div class="alerta alerta-exito">{{ mensaje }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="alerta alerta-error">{{ error }}</div>
+    {% endif %}
+        {% block contenido %}{% endblock %}
+    </main>
+</body>
+</html>

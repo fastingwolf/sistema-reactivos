@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Menú principal{% endblock %}
+
+{% block contenido %}
+<h2>Bienvenido, {{ usuario.nombre }}</h2>
+<p>Rol: <strong>{{ usuario.rol }}</strong></p>
+
+<ul>
+    {% if usuario.rol == "docente" %}
+        <li><a href="/docente">Panel de docente</a></li>
+    {% elif usuario.rol == "estudiante" %}
+        <li><a href="/estudiante">Panel de estudiante</a></li>
+    {% elif usuario.rol == "deposito" %}
+        <li><a href="/deposito">Panel de depósito</a></li>
+    {% endif %}
+    <li><a href="/reactivos">Ver reactivos disponibles</a></li>
+    <li><a href="/usuarios">Ver usuarios registrados</a></li>
+</ul>
+{% endblock %}

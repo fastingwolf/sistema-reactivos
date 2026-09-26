@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ reactivo.nombre }} — {{ contenedor.codigo_barras }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+            color: #222;
+        }
+        .tarjeta {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 22px;
+            margin: 0 0 8px 0;
+            color: #2c3e50;
+        }
+        .codigo {
+            font-family: monospace;
+            background: #eef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+        .dato {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .dato:last-child { border-bottom: none; }
+        .etiqueta { color: #666; font-weight: 600; }
+        .valor { font-weight: 500; text-align: right; }
+        .peligro-baja { color: #27ae60; font-weight: bold; }
+        .peligro-media { color: #e67e22; font-weight: bold; }
+        .peligro-alta { color: #c0392b; font-weight: bold; }
+        .cantidad {
+            font-size: 20px;
+            color: #2980b9;
+            font-weight: bold;
+        }
+        .barra {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .barra-relleno {
+            height: 100%;
+            background: #3498db;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="tarjeta">
+        <h1>{{ reactivo.nombre }}</h1>
+        <div class="codigo">{{ contenedor.codigo_barras }}</div>
+
+        <div class="dato">
+            <span class="etiqueta">CAS</span>
+            <span class="valor">{{ reactivo.cas }}</span>
+        </div>
+
+        {% if reactivo.formula %}
+        <div class="dato">
+            <span class="etiqueta">Fórmula</span>
+            <span class="valor">{{ reactivo.formula }}</span>
+        </div>
+        {% endif %}
+
+        <div class="dato">
+            <span class="etiqueta">Peligrosidad</span>
+            <span class="valor peligro-{{ reactivo.peligrosidad }}">
+                {{ reactivo.peligrosidad|upper }}
+            </span>
+        </div>
+
+        <div class="dato">
+            <span class="etiqueta">Unidad</span>
+            <span class="valor">{{ reactivo.unidad }}</span>
+        </div>
+
+        <div class="dato">
+            <span class="etiqueta">Cantidad actual</span>
+            <span class="valor cantidad">
+                {{ contenedor.cantidad_actual }} / {{ contenedor.cantidad_inicial }} {{ reactivo.unidad }}
+            </span>
+        </div>
+
+        <div class="barra">
+            {% set porcentaje = (contenedor.cantidad_actual / contenedor.cantidad_inicial * 100) if contenedor.cantidad_inicial > 0 else 0 %}
+            <div class="barra-relleno" style="width: {{ porcentaje }}%;"></div>
+        </div>
+
+        <div class="dato">
+            <span class="etiqueta">Lote</span>
+            <span class="valor">{{ contenedor.lote or "—" }}</span>
+        </div>
+
+        <div class="dato">
+            <span class="etiqueta">Ubicación</span>
+            <span class="valor">{{ contenedor.ubicacion }}</span>
+        </div>
+
+        {% if contenedor.caducidad %}
+        <div class="dato">
+            <span class="etiqueta">Caducidad</span>
+            <span class="valor">{{ contenedor.caducidad.strftime("%d/%m/%Y") }}</span>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

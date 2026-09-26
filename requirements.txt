@@ -1,0 +1,11 @@
+sqlalchemy
+bcrypt==4.3.0
+qrcode[pil]
+fastapi
+uvicorn
+email-validator
+jinja2
+python-multipart
+itsdangerous
+pandas
+openpyxl

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block contenido %}
+<h2>Iniciar sesión</h2>
+<form method="post" action="/login">
+    <label>Correo</label>
+    <input type="email" name="correo" required autofocus>
+
+    <label>Contraseña</label>
+    <input type="password" name="password" required>
+
+    <button type="submit">Entrar</button>
+</form>
+
+<p>¿No tienes cuenta? <a href="/registro">Regístrate aquí</a></p>
+{% endblock %}

@@ -1,0 +1,32 @@
+<!-- templates/escaner_resultado.html -->
+{% extends "base.html" %}
+
+{% block title %}Resultado del Escaneo{% endblock %}
+
+{% block contenido %}
+{% if error %}
+    <div class="alerta alerta-error">{{ error }}</div>
+    <p><a href="/escaner">Volver a escanear</a></p>
+{% else %}
+    <!-- Reutiliza la tarjeta de información del contenedor -->
+    <div class="tarjeta-qr">
+        <h2>{{ reactivo.nombre }}</h2>
+        <p><strong>Código:</strong> {{ contenedor.codigo_barras }}</p>
+        <p><strong>CAS:</strong> {{ reactivo.cas }}</p>
+        <p><strong>Peligrosidad:</strong> {{ reactivo.peligrosidad|upper }}</p>
+        <p><strong>Cantidad:</strong> {{ contenedor.cantidad_actual }} {{ reactivo.unidad }}</p>
+        <p><strong>Lote:</strong> {{ contenedor.lote or "—" }}</p>
+        <p><strong>Ubicación:</strong> {{ contenedor.ubicacion }}</p>
+    </div>
+
+    <h3>Acciones Rápidas</h3>
+    <form method="post" action="/movimientos/registrar">
+        <input type="hidden" name="contenedor_id" value="{{ contenedor.id }}">
+        <label>Cantidad a usar/retirar</label>
+        <input type="number" name="cantidad" step="0.01" required>
+        <button type="submit">Registrar Movimiento</button>
+    </form>
+    
+    <p><a href="/escaner">Escanear otro</a></p>
+{% endif %}
+{% endblock %}
