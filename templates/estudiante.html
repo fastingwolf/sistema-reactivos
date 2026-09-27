@@ -104,15 +104,37 @@
                     {% for s in solicitudes %}
                     <tr class="table-row">
                         <td class="cell-id">#{{ s.id }}</td>
+                        
+                        <!-- Reactivo: busca por relación, por CAS o por atributo directo -->
                         <td class="cell-name">
-                            {{ s.reactivo.nombre if s.reactivo else (s.nombre_reactivo or "Reactivo #" ~ s.reactivo_id) }}
+                            {% if s.reactivo and s.reactivo.nombre %}
+                                {{ s.reactivo.nombre }}
+                            {% elif s.nombre_reactivo %}
+                                {{ s.nombre_reactivo }}
+                            {% elif s.cas_reactivo %}
+                                CAS: {{ s.cas_reactivo }}
+                            {% elif s.reactivo_cas %}
+                                CAS: {{ s.reactivo_cas }}
+                            {% else %}
+                                Reactivo #{{ s.reactivo_id or s.id }}
+                            {% endif %}
                         </td>
-                        <td><strong>{{ s.cantidad }}</strong></td>
+
+                        <!-- Cantidad: evalúa cantidad_solicitada o cantidad -->
+                        <td>
+                            <strong>
+                                {{ s.cantidad_solicitada if s.cantidad_solicitada is defined and s.cantidad_solicitada is not none else (s.cantidad or "—") }}
+                            </strong>
+                        </td>
+
+                        <!-- Laboratorio -->
                         <td>
                             <span class="lab-pill">
                                 <i class="bi bi-geo-alt-fill"></i> {{ s.laboratorio_destino or s.laboratorio }}
                             </span>
                         </td>
+
+                        <!-- Estado -->
                         <td>
                             {% set est = (s.estado | lower) if s.estado else '' %}
                             {% if 'pendiente' in est %}
