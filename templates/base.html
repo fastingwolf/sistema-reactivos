@@ -28,29 +28,37 @@
                 </a>
 
                 <div class="nav-links">
-                    <a href="/reactivos" class="nav-item {% if request.path == '/reactivos' %}active{% endif %}">
-                        <i class="bi bi-box-seam"></i> Inventario
-                    </a>
-                    <a href="/escaner" class="nav-item {% if request.path == '/escaner' %}active{% endif %}">
-                        <i class="bi bi-qr-code-scan"></i> Escáner QR
-                    </a>
+                    {% if usuario.rol == 'estudiante' %}
+                        <!-- Enlaces exclusivos para Estudiante -->
+                        <a href="/estudiante" class="nav-item {% if request.path == '/estudiante' %}active{% endif %}">
+                            <i class="bi bi-clipboard2-check"></i> Mis solicitudes
+                        </a>
+                    {% else %}
+                        <!-- Enlaces para Docente, Depósito y Administrador -->
+                        <a href="/reactivos" class="nav-item {% if request.path == '/reactivos' %}active{% endif %}">
+                            <i class="bi bi-box-seam"></i> Inventario
+                        </a>
+                        <a href="/escaner" class="nav-item {% if request.path == '/escaner' %}active{% endif %}">
+                            <i class="bi bi-qr-code-scan"></i> Escáner QR
+                        </a>
 
-                    {% if usuario.rol in ['docente', 'administrador'] %}
-                    <a href="/docente" class="nav-item {% if request.path == '/docente' %}active{% endif %}">
-                        <i class="bi bi-clipboard2-check"></i> Solicitudes
-                    </a>
-                    {% endif %}
+                        {% if usuario.rol in ['docente', 'administrador'] %}
+                        <a href="/docente" class="nav-item {% if request.path == '/docente' %}active{% endif %}">
+                            <i class="bi bi-clipboard2-check"></i> Solicitudes
+                        </a>
+                        {% endif %}
 
-                    {% if usuario.rol in ['deposito', 'administrador'] %}
-                    <a href="/deposito" class="nav-item {% if request.path == '/deposito' %}active{% endif %}">
-                        <i class="bi bi-archive"></i> Depósito
-                    </a>
-                    {% endif %}
+                        {% if usuario.rol in ['deposito', 'administrador'] %}
+                        <a href="/deposito" class="nav-item {% if request.path == '/deposito' %}active{% endif %}">
+                            <i class="bi bi-archive"></i> Depósito
+                        </a>
+                        {% endif %}
 
-                    {% if usuario.rol == 'administrador' %}
-                    <a href="/usuarios" class="nav-item {% if request.path == '/usuarios' %}active{% endif %}">
-                        <i class="bi bi-people"></i> Usuarios
-                    </a>
+                        {% if usuario.rol == 'administrador' %}
+                        <a href="/usuarios" class="nav-item {% if request.path == '/usuarios' %}active{% endif %}">
+                            <i class="bi bi-people"></i> Usuarios
+                        </a>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

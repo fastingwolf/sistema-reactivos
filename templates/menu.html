@@ -4,31 +4,32 @@
 
 {% block contenido %}
 <div class="dashboard-section">
-    <!-- Encabezado sutil sin repetir nombre ni rol -->
     <div class="dashboard-header">
         <h2>Panel de Control</h2>
         <p>Selecciona un módulo para gestionar o consultar en el laboratorio</p>
     </div>
 
-    <!-- Cuadrícula de tarjetas modernas -->
     <div class="cards-grid">
         
-        <!-- Módulo específico según el rol del usuario -->
         {% if usuario.rol == 'estudiante' %}
+        <!-- Módulo exclusivo de Estudiante -->
         <a href="/estudiante" class="module-card">
             <div class="card-icon card-icon-indigo">
-                <i class="bi bi-person-workspace"></i>
+                <i class="bi bi-clipboard2-check"></i>
             </div>
             <div class="card-content">
-                <h3>Panel de Estudiante</h3>
-                <p>Gestiona tus solicitudes de materiales, reactivos y consulta el historial de prácticas.</p>
+                <h3>Mis solicitudes</h3>
+                <p>Crea pedidos de reactivos para tus prácticas de laboratorio y revisa su estado de autorización.</p>
             </div>
             <div class="card-action">
-                <span>Acceder</span>
+                <span>Ir a mis solicitudes</span>
                 <i class="bi bi-arrow-right"></i>
             </div>
         </a>
-        {% elif usuario.rol in ['docente', 'administrador'] %}
+
+        {% else %}
+        <!-- Módulos para Personal y Docentes -->
+        {% if usuario.rol in ['docente', 'administrador'] %}
         <a href="/docente" class="module-card">
             <div class="card-icon card-icon-amber">
                 <i class="bi bi-clipboard2-check"></i>
@@ -60,7 +61,7 @@
         </a>
         {% endif %}
 
-        <!-- Inventario general de reactivos (para todos) -->
+        <!-- Inventario general -->
         <a href="/reactivos" class="module-card">
             <div class="card-icon card-icon-blue">
                 <i class="bi bi-box-seam"></i>
@@ -75,7 +76,7 @@
             </div>
         </a>
 
-        <!-- Escáner QR de frascos y contenedores -->
+        <!-- Escáner QR -->
         <a href="/escaner" class="module-card">
             <div class="card-icon card-icon-purple">
                 <i class="bi bi-qr-code-scan"></i>
@@ -90,22 +91,22 @@
             </div>
         </a>
 
-        <!-- Directorio de Usuarios (Solo accesible por Administradores) -->
-{% if usuario.rol == 'administrador' %}
-<a href="/usuarios" class="module-card">
-    <div class="card-icon card-icon-slate">
-        <i class="bi bi-people"></i>
-    </div>
-    <div class="card-content">
-        <h3>Directorio de Usuarios</h3>
-        <p>Consulta y administra la lista de integrantes del laboratorio y docentes.</p>
-    </div>
-    <div class="card-action">
-        <span>Gestionar</span>
-        <i class="bi bi-arrow-right"></i>
-    </div>
-</a>
-{% endif %}
+        {% if usuario.rol == 'administrador' %}
+        <a href="/usuarios" class="module-card">
+            <div class="card-icon card-icon-slate">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="card-content">
+                <h3>Directorio de Usuarios</h3>
+                <p>Consulta y administra la lista de integrantes del laboratorio y docentes.</p>
+            </div>
+            <div class="card-action">
+                <span>Gestionar</span>
+                <i class="bi bi-arrow-right"></i>
+            </div>
+        </a>
+        {% endif %}
+        {% endif %}
 
     </div>
 </div>
