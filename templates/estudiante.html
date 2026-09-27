@@ -104,33 +104,35 @@
                     {% for s in solicitudes %}
                     <tr class="table-row">
                         <td class="cell-id">#{{ s.id }}</td>
-                        
-                        <!-- Reactivo: busca por relación, por CAS o por atributo directo -->
+
+                        <!-- Nombre del reactivo (busca en detalles o en el código de autorización) -->
                         <td class="cell-name">
-                            {% if s.reactivo and s.reactivo.nombre %}
-                                {{ s.reactivo.nombre }}
-                            {% elif s.nombre_reactivo %}
-                                {{ s.nombre_reactivo }}
-                            {% elif s.cas_reactivo %}
-                                CAS: {{ s.cas_reactivo }}
-                            {% elif s.reactivo_cas %}
-                                CAS: {{ s.reactivo_cas }}
+                            {% if s.detalles and s.detalles|length > 0 and s.detalles[0].reactivo %}
+                                {{ s.detalles[0].reactivo.nombre }}
+                            {% elif s.codigo and s.codigo.reactivo %}
+                                {{ s.codigo.reactivo.nombre }}
                             {% else %}
-                                Reactivo #{{ s.reactivo_id or s.id }}
+                                Reactivo Aut. #{{ s.codigo.reactivo_id if s.codigo else '?' }}
                             {% endif %}
                         </td>
 
-                        <!-- Cantidad: evalúa cantidad_solicitada o cantidad -->
+                        <!-- Cantidad solicitada (busca la pedida en detalles, o muestra la máxima del código) -->
                         <td>
                             <strong>
-                                {{ s.cantidad_solicitada if s.cantidad_solicitada is defined and s.cantidad_solicitada is not none else (s.cantidad or "—") }}
+                                {% if s.detalles and s.detalles|length > 0 and s.detalles[0].cantidad %}
+                                    {{ s.detalles[0].cantidad }} {% if s.detalles[0].reactivo %}{{ s.detalles[0].reactivo.unidad }}{% endif %}
+                                {% elif s.codigo and s.codigo.cantidad_maxima %}
+                                    {{ s.codigo.cantidad_maxima }} (Máx)
+                                {% else %}
+                                    —
+                                {% endif %}
                             </strong>
                         </td>
 
-                        <!-- Laboratorio -->
+                        <!-- Laboratorio destino -->
                         <td>
                             <span class="lab-pill">
-                                <i class="bi bi-geo-alt-fill"></i> {{ s.laboratorio_destino or s.laboratorio }}
+                                <i class="bi bi-geo-alt-fill"></i> {{ s.laboratorio_destino }}
                             </span>
                         </td>
 
