@@ -20,6 +20,10 @@ def crear_solicitud(session, estudiante, codigo_str, reactivo, cantidad,
         laboratorio_destino=laboratorio_destino,
         estado="pendiente",
     )
+    
+    # Asignación manual para forzar la lectura en Jinja en memoria
+    solicitud.cantidad_solicitada = cantidad
+    
     session.add(solicitud)
     session.commit()
 

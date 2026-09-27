@@ -116,13 +116,17 @@
                             {% endif %}
                         </td>
 
-                        <!-- Cantidad solicitada (busca la pedida en detalles, o muestra la máxima del código) -->
+                        <!-- Cantidad solicitada -->
                         <td>
                             <strong>
-                                {% if s.detalles and s.detalles|length > 0 and s.detalles[0].cantidad %}
-                                    {{ s.detalles[0].cantidad }} {% if s.detalles[0].reactivo %}{{ s.detalles[0].reactivo.unidad }}{% endif %}
+                                {% if s.cantidad_solicitada is defined and s.cantidad_solicitada %}
+                                    {{ s.cantidad_solicitada }} 
+                                    {% if s.codigo and s.codigo.reactivo %} {{ s.codigo.reactivo.unidad }} {% endif %}
+                                {% elif s.detalles and s.detalles|length > 0 and s.detalles[0].cantidad %}
+                                    {{ s.detalles[0].cantidad }} 
+                                    {% if s.detalles[0].reactivo %}{{ s.detalles[0].reactivo.unidad }}{% endif %}
                                 {% elif s.codigo and s.codigo.cantidad_maxima %}
-                                    {{ s.codigo.cantidad_maxima }} (Máx)
+                                    Límite: {{ s.codigo.cantidad_maxima }}
                                 {% else %}
                                     —
                                 {% endif %}
