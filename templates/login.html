@@ -1,17 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Iniciar sesión{% endblock %}
+{% block title %}Iniciar Sesión - ReactivosLab{% endblock %}
 
 {% block contenido %}
-<h2>Iniciar sesión</h2>
-<form method="post" action="/login">
-    <label>Correo</label>
-    <input type="email" name="correo" required autofocus>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-brand-icon">
+                <i class="bi bi-radioactive"></i>
+            </div>
+            <h2>Iniciar Sesión</h2>
+            <p>Ingresa tus credenciales para acceder al sistema</p>
+        </div>
 
-    <label>Contraseña</label>
-    <input type="password" name="password" required>
+        <form method="POST" action="/login" class="auth-form">
+            <div class="form-group">
+                <label for="correo">Correo Electrónico</label>
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.com" required autofocus>
+                </div>
+            </div>
 
-    <button type="submit">Entrar</button>
-</form>
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+            </div>
 
-<p>¿No tienes cuenta? <a href="/registro">Regístrate aquí</a></p>
+            <button type="submit" class="btn btn-primary btn-block">
+                <span>Entrar</span>
+                <i class="bi bi-box-arrow-in-right"></i>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>¿No tienes cuenta? <a href="/registro">Regístrate aquí</a></p>
+        </div>
+    </div>
+</div>
 {% endblock %}
