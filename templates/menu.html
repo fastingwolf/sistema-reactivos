@@ -1,24 +1,112 @@
 {% extends "base.html" %}
-{% block title %}Menú principal{% endblock %}
+
+{% block title %}Panel Principal - Sistema de Reactivos{% endblock %}
 
 {% block contenido %}
-<h2>Bienvenido, {{ usuario.nombre }}</h2>
-<p>Rol: <strong>{{ usuario.rol }}</strong></p>
+<div class="dashboard-section">
+    <!-- Encabezado sutil sin repetir nombre ni rol -->
+    <div class="dashboard-header">
+        <h2>Panel de Control</h2>
+        <p>Selecciona un módulo para gestionar o consultar en el laboratorio</p>
+    </div>
 
-<ul>
-    {% if usuario.rol == "deposito" or usuario.rol == "admin" %}
-        <li><a href="/escaner">📷 Escanear código QR</a></li>
-    {% endif %}
+    <!-- Cuadrícula de tarjetas modernas -->
+    <div class="cards-grid">
+        
+        <!-- Módulo específico según el rol del usuario -->
+        {% if usuario.rol == 'estudiante' %}
+        <a href="/estudiante" class="module-card">
+            <div class="card-icon card-icon-indigo">
+                <i class="bi bi-person-workspace"></i>
+            </div>
+            <div class="card-content">
+                <h3>Panel de Estudiante</h3>
+                <p>Gestiona tus solicitudes de materiales, reactivos y consulta el historial de prácticas.</p>
+            </div>
+            <div class="card-action">
+                <span>Acceder</span>
+                <i class="bi bi-arrow-right"></i>
+            </div>
+        </a>
+        {% elif usuario.rol in ['docente', 'administrador'] %}
+        <a href="/docente" class="module-card">
+            <div class="card-icon card-icon-amber">
+                <i class="bi bi-clipboard2-check"></i>
+            </div>
+            <div class="card-content">
+                <h3>Gestión de Solicitudes</h3>
+                <p>Revisa, aprueba y autoriza las peticiones de reactivos enviadas por los estudiantes.</p>
+            </div>
+            <div class="card-action">
+                <span>Acceder</span>
+                <i class="bi bi-arrow-right"></i>
+            </div>
+        </a>
+        {% endif %}
 
-    {% if usuario.rol == "docente" %}
-        <li><a href="/docente">Panel de docente</a></li>
-    {% elif usuario.rol == "estudiante" %}
-        <li><a href="/estudiante">Panel de estudiante</a></li>
-    {% elif usuario.rol == "deposito" %}
-        <li><a href="/deposito">Panel de depósito</a></li>
-    {% endif %}
+        {% if usuario.rol in ['deposito', 'administrador'] %}
+        <a href="/deposito" class="module-card">
+            <div class="card-icon card-icon-emerald">
+                <i class="bi bi-archive"></i>
+            </div>
+            <div class="card-content">
+                <h3>Control de Depósito</h3>
+                <p>Supervisa entradas, salidas de almacén, dispensación física y reposición de stock.</p>
+            </div>
+            <div class="card-action">
+                <span>Acceder</span>
+                <i class="bi bi-arrow-right"></i>
+            </div>
+        </a>
+        {% endif %}
 
-    <li><a href="/reactivos">Ver reactivos disponibles</a></li>
-    <li><a href="/usuarios">Ver usuarios registrados</a></li>
-</ul>
+        <!-- Inventario general de reactivos (para todos) -->
+        <a href="/reactivos" class="module-card">
+            <div class="card-icon card-icon-blue">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <div class="card-content">
+                <h3>Inventario de Reactivos</h3>
+                <p>Consulta existencias, ubicación en estanterías, pureza y fichas técnicas de seguridad.</p>
+            </div>
+            <div class="card-action">
+                <span>Ver inventario</span>
+                <i class="bi bi-arrow-right"></i>
+            </div>
+        </a>
+
+        <!-- Escáner QR de frascos y contenedores -->
+        <a href="/escaner" class="module-card">
+            <div class="card-icon card-icon-purple">
+                <i class="bi bi-qr-code-scan"></i>
+            </div>
+            <div class="card-content">
+                <h3>Escáner QR</h3>
+                <p>Identifica frascos y contenedores al instante apuntando la cámara a los códigos QR.</p>
+            </div>
+            <div class="card-action">
+                <span>Abrir cámara</span>
+                <i class="bi bi-arrow-right"></i>
+            </div>
+        </a>
+
+        <!-- Directorio de Usuarios -->
+        {% if usuario.rol == 'administrador' or usuario.rol == 'estudiante' %}
+        <a href="/usuarios" class="module-card">
+            <div class="card-icon card-icon-slate">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="card-content">
+                <h3>Directorio de Usuarios</h3>
+                <p>Consulta la lista de integrantes del laboratorio, docentes y personal de soporte.</p>
+            </div>
+            <div class="card-action">
+                <span>Consultar</span>
+                <i class="bi bi-arrow-right"></i>
+            </div>
+        </a>
+        {% endif %}
+
+    </div>
+</div>
 {% endblock %}

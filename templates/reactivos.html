@@ -1,38 +1,138 @@
 {% extends "base.html" %}
-{% block title %}Reactivos{% endblock %}
+{% block title %}Inventario de Reactivos{% endblock %}
 
 {% block contenido %}
-<h2>Reactivos registrados</h2>
+<div class="table-view-container">
+    <!-- Encabezado y barra de acciones -->
+    <div class="view-header">
+        <div>
+            <a href="/menu" class="back-link">
+                <i class="bi bi-arrow-left"></i> Volver al panel
+            </a>
+            <h2 class="view-title">Inventario de Reactivos</h2>
+            <p class="view-subtitle">Catálogo general de reactivos químicos, especificaciones y códigos QR</p>
+        </div>
+        <div class="view-actions">
+            <a href="/reactivos/nuevo" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i>
+                <span>Agregar nuevo reactivo</span>
+            </a>
+        </div>
+    </div>
 
-<p><a href="/reactivos/nuevo">➕ Agregar nuevo reactivo</a></p>
+    <!-- Tarjeta contenedora de datos -->
+    <div class="data-card">
+        <!-- Barra de herramientas: Búsqueda y contador -->
+        <div class="table-search-bar">
+            <div class="search-input-wrapper">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Buscar por nombre, código CAS o fórmula..." onkeyup="filtrarReactivos()">
+            </div>
+            <div class="counter-badge" id="counterBadge">
+                Total: {{ reactivos | length }} reactivo{% if reactivos | length != 1 %}s{% endif %}
+            </div>
+        </div>
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>CAS</th>
-        <th>Fórmula</th>
-        <th>Unidad</th>
-        <th>Peligrosidad</th>
-        <th>QR</th>
-    </tr>
-    {% for r in reactivos %}
-    <tr>
-        <td>{{ r.id }}</td>
-        <td>{{ r.nombre }}</td>
-        <td>{{ r.cas }}</td>
-        <td>{{ r.formula or "—" }}</td>
-        <td>{{ r.unidad }}</td>
-        <td>{{ r.peligrosidad }}</td>
-        <td>
-            {% for c in r.contenedores %}
-                <a href="/qr/{{ c.codigo_barras }}" target="_blank" title="{{ c.codigo_barras }}">📱</a>
-                <a href="/qr/{{ c.codigo_barras }}.png" target="_blank" title="Descargar QR">🖼️</a>
-            {% endfor %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+        <!-- Tabla interactiva y responsiva -->
+        <div class="table-responsive">
+            <table class="custom-table" id="tablaReactivos">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">ID</th>
+                        <th>Nombre</th>
+                        <th>Nº CAS</th>
+                        <th>Fórmula</th>
+                        <th>Unidad</th>
+                        <th>Peligrosidad</th>
+                        <th>Contenedores & QR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reactivos %}
+                    <tr class="table-row">
+                        <td class="cell-id">#{{ r.id }}</td>
+                        <td class="cell-name">{{ r.nombre }}</td>
+                        <td class="cell-cas"><code>{{ r.cas }}</code></td>
+                        <td class="cell-formula">
+                            {% if r.formula %}
+                                <span class="formula-tag">{{ r.formula }}</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="cell-unit"><span class="unit-badge">{{ r.unidad }}</span></td>
+                        <td class="cell-hazard">
+                            {% set p = (r.peligrosidad | lower) if r.peligrosidad else '' %}
+                            {% if p == 'alta' or p == 'muy alta' %}
+                                <span class="hazard-badge hazard-high"><i class="bi bi-exclamation-octagon-fill"></i> {{ r.peligrosidad }}</span>
+                            {% elif p == 'media' %}
+                                <span class="hazard-badge hazard-medium"><i class="bi bi-exclamation-triangle-fill"></i> {{ r.peligrosidad }}</span>
+                            {% elif p == 'baja' %}
+                                <span class="hazard-badge hazard-low"><i class="bi bi-shield-check"></i> {{ r.peligrosidad }}</span>
+                            {% else %}
+                                <span class="hazard-badge hazard-neutral">{{ r.peligrosidad or 'No def.' }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="cell-qr">
+                            {% if r.contenedores and r.contenedores | length > 0 %}
+                                <div class="qr-chips-container">
+                                    {% for c in r.contenedores %}
+                                    <div class="qr-chip">
+                                        <span class="qr-code-text" title="Código de barras">{{ c.codigo_barras }}</span>
+                                        <div class="qr-chip-actions">
+                                            <a href="/qr/{{ c.codigo_barras }}" target="_blank" class="qr-action-btn" title="Ver QR">
+                                                <i class="bi bi-qr-code"></i>
+                                            </a>
+                                            <a href="/qr/{{ c.codigo_barras }}.png" target="_blank" class="qr-action-btn" title="Descargar PNG">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <span class="text-muted" style="font-size: 0.8rem;">Sin frascos asignados</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="empty-state-cell">
+                            <i class="bi bi-inbox empty-icon"></i>
+                            <p>No hay reactivos registrados en el inventario actualmente.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-<p><a href="/menu">← Volver al menú</a></p>
+<!-- Filtro en tiempo real sin recargar página -->
+<script>
+function filtrarReactivos() {
+    const input = document.getElementById("searchInput");
+    const filtro = input.value.toLowerCase();
+    const filas = document.querySelectorAll("#tablaReactivos tbody tr.table-row");
+    let visibles = 0;
+
+    filas.forEach(fila => {
+        const texto = fila.textContent.toLowerCase();
+        if (texto.includes(filtro)) {
+            fila.style.display = "";
+            visibles++;
+        } else {
+            fila.style.display = "none";
+        }
+    });
+
+    const badge = document.getElementById("counterBadge");
+    if (filtro.trim() === "") {
+        badge.innerText = `Total: ${filas.length} reactivos`;
+    } else {
+        badge.innerText = `${visibles} resultado${visibles !== 1 ? 's' : ''}`;
+    }
+}
+</script>
 {% endblock %}
