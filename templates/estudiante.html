@@ -5,6 +5,19 @@
 <div class="table-view-container">
     <!-- Encabezado de la vista -->
     <div class="view-header">
+        <!-- Mensajes y Alertas del Sistema -->
+    {% if error %}
+        <div class="alerta alerta-error mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>{{ error }}</span>
+        </div>
+    {% endif %}
+    {% if mensaje %}
+        <div class="alerta alerta-exito mb-4">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ mensaje }}</span>
+        </div>
+    {% endif %}
         <div>
             <a href="/menu" class="back-link">
                 <i class="bi bi-arrow-left"></i> Volver al panel
