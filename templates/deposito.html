@@ -1,37 +1,166 @@
 {% extends "base.html" %}
-{% block title %}Panel depósito{% endblock %}
+{% block title %}Panel de Depósito - ReactivosLab{% endblock %}
 
 {% block contenido %}
-<h2>Panel de depósito</h2>
-<h3>Acciones rápidas</h3>
-<p>
-    <a href="/escaner">📷 Escanear código QR</a>
-</p>
-<h3>Solicitudes pendientes</h3>
+<div class="table-view-container">
+    <!-- Encabezado de la vista -->
+    <div class="view-header">
+        <div>
+            <a href="/menu" class="back-link">
+                <i class="bi bi-arrow-left"></i> Volver al panel
+            </a>
+            <h2 class="view-title">Panel de Depósito</h2>
+            <p class="view-subtitle">Supervisión de pedidos pendientes, dispensación y entrega de reactivos</p>
+        </div>
+        <div class="view-actions">
+            <a href="/escaner" class="btn btn-outline">
+                <i class="bi bi-qr-code-scan"></i>
+                <span>Escanear código QR</span>
+            </a>
+        </div>
+    </div>
 
-<table>
-    <tr><th>ID</th><th>Estudiante</th><th>Reactivo</th><th>Cantidad</th><th>Laboratorio</th></tr>
-    {% for s in pendientes %}
-    <tr>
-        <td>{{ s.id }}</td>
-        <td>{{ s.estudiante.nombre }}</td>
-        <td>{{ s.detalles[0].reactivo.nombre }}</td>
-        <td>{{ s.detalles[0].cantidad_solicitada }}</td>
-        <td>{{ s.laboratorio_destino }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    <!-- 1. Tarjeta: Solicitudes Pendientes de Entrega -->
+    <div class="data-card mb-4">
+        <div class="card-title-bar">
+            <div class="card-title-info">
+                <i class="bi bi-hourglass-split title-icon"></i>
+                <h3>Solicitudes pendientes</h3>
+            </div>
+            <div class="counter-badge">
+                {{ solicitudes | length }} pendiente{% if solicitudes | length != 1 %}s{% endif %} por despachar
+            </div>
+        </div>
 
-<h3>Entregar solicitud</h3>
-<form method="post" action="/deposito/entregar">
-    <label>ID de solicitud</label>
-    <input type="number" name="solicitud_id" required>
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th>Estudiante</th>
+                        <th>Reactivo</th>
+                        <th>Cantidad</th>
+                        <th>Laboratorio</th>
+                        <th style="text-align: right;">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in solicitudes %}
+                    <tr class="table-row">
+                        <td class="cell-id">#{{ s.id }}</td>
+                        <td class="cell-name">
+                            <span class="user-inline-pill">
+                                <i class="bi bi-person-circle"></i>
+                                {{ s.estudiante.nombre if s.estudiante else ('Usuario #' ~ s.estudiante_id) }}
+                            </span>
+                        </td>
+                        <td>
+                            <strong>
+                                {% if s.detalles and s.detalles|length > 0 and s.detalles[0].reactivo %}
+                                    {{ s.detalles[0].reactivo.nombre }}
+                                {% elif s.codigo and s.codigo.reactivo %}
+                                    {{ s.codigo.reactivo.nombre }}
+                                {% elif s.nombre_reactivo %}
+                                    {{ s.nombre_reactivo }}
+                                {% else %}
+                                    Reactivo #{{ s.reactivo_id or s.id }}
+                                {% endif %}
+                            </strong>
+                        </td>
+                        <td>
+                            <span class="qty-pill">
+                                {% if s.cantidad_solicitada is defined and s.cantidad_solicitada %}
+                                    {{ s.cantidad_solicitada }}
+                                {% elif s.detalles and s.detalles|length > 0 and s.detalles[0].cantidad %}
+                                    {{ s.detalles[0].cantidad }}
+                                {% elif s.cantidad is defined and s.cantidad is not none %}
+                                    {{ s.cantidad }}
+                                {% elif s.codigo and s.codigo.cantidad_maxima %}
+                                    {{ s.codigo.cantidad_maxima }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="lab-pill">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                {{ s.laboratorio_destino or s.laboratorio or "No especificado" }}
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn btn-sm btn-primary-soft" onclick="cargarSolicitud('{{ s.id }}')">
+                                <i class="bi bi-box-arrow-down"></i>
+                                <span>Despachar</span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="empty-state-cell">
+                            <i class="bi bi-check2-circle empty-icon text-success"></i>
+                            <p>No hay solicitudes pendientes en este momento. ¡Todo está despachado!</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    <label>Código de barras del contenedor</label>
-    <input type="text" name="codigo_contenedor" required placeholder="CNT-XXXXXXXX">
+    <!-- 2. Tarjeta: Formulario de Entrega -->
+    <div class="data-card" id="seccion-entrega">
+        <div class="card-title-bar">
+            <div class="card-title-info">
+                <i class="bi bi-box2-check title-icon"></i>
+                <h3>Entregar solicitud</h3>
+            </div>
+            <span class="helper-text">Registra la salida física del frasco o contenedor</span>
+        </div>
 
-    <button type="submit">Entregar</button>
-</form>
+        <form method="POST" action="/deposito" class="inner-form-padding">
+            <div class="form-grid-2">
+                <!-- ID de la solicitud -->
+                <div class="form-group">
+                    <label for="solicitud_id">ID de solicitud</label>
+                    <div class="input-icon-wrapper">
+                        <i class="bi bi-hash"></i>
+                        <input type="number" id="solicitud_id" name="solicitud_id" placeholder="Ej. 1" required>
+                    </div>
+                </div>
 
-<p><a href="/menu">← Volver al menú</a></p>
+                <!-- Código de barras / etiqueta del contenedor -->
+                <div class="form-group">
+                    <label for="codigo_contenedor">Código de barras del contenedor</label>
+                    <div class="input-icon-wrapper">
+                        <i class="bi bi-upc-scan"></i>
+                        <input type="text" id="codigo_contenedor" name="codigo_contenedor" placeholder="CNT-XXXXXXXX" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions-right">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check2-circle"></i>
+                    <span>Confirmar entrega</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Rellena el ID automáticamente al pulsar "Despachar" en la tabla
+function cargarSolicitud(id) {
+    const inputId = document.getElementById("solicitud_id");
+    const contenedorInput = document.getElementById("codigo_contenedor");
+    if (inputId) {
+        inputId.value = id;
+        document.getElementById("seccion-entrega").scrollIntoView({ behavior: 'smooth' });
+        if (contenedorInput) {
+            contenedorInput.focus();
+        }
+    }
+}
+</script>
 {% endblock %}

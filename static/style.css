@@ -1023,3 +1023,66 @@ body {
         padding: 0.75rem 1rem;
     }
 }
+
+/* --- Estilos específicos para Panel de Depósito --- */
+.btn-outline {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    color: var(--text-dark);
+    padding: 0.6rem 1.1rem;
+    font-weight: 500;
+}
+
+.btn-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: var(--primary);
+}
+
+.btn-sm {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    gap: 0.35rem;
+}
+
+.btn-primary-soft {
+    background: #eff6ff;
+    color: var(--primary);
+    border: 1px solid #bfdbfe;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-primary-soft:hover {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+}
+
+.user-inline-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.user-inline-pill i {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+}
+
+.qty-pill {
+    font-weight: 700;
+    color: #0f172a;
+    background: #f1f5f9;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.text-success {
+    color: #16a34a !important;
+}
