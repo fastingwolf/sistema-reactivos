@@ -40,18 +40,22 @@
                 </div>
             </div>
 
-            <!-- Rol (Requerido por el backend) -->
+            <!-- Rol (Actualizado con Depósito y Admin) -->
             <div class="form-group">
                 <label for="rol">Tipo de Usuario (Rol)</label>
                 <div class="input-icon-wrapper select-wrapper">
                     <i class="bi bi-shield-lock"></i>
                     <select id="rol" name="rol" required onchange="cambiarRol()">
                         {% if not docentes %}
-                            <!-- Si aún no hay docentes en la base de datos, se fuerza primero el rol docente -->
+                            <!-- Si la base está vacía, fuerzas la creación de personal base -->
                             <option value="docente" selected>Docente</option>
+                            <option value="deposito">Personal de Depósito</option>
+                            <option value="administrador">Administrador</option>
                         {% else %}
                             <option value="estudiante" selected>Estudiante</option>
                             <option value="docente">Docente</option>
+                            <option value="deposito">Personal de Depósito</option>
+                            <option value="administrador">Administrador</option>
                         {% endif %}
                     </select>
                 </div>
@@ -89,7 +93,8 @@ function cambiarRol() {
     const grupoDocente = document.getElementById("grupoDocente");
     const docenteInput = document.getElementById("docente_id");
 
-    if (rolSelect.value === "docente") {
+    // Si el rol NO es estudiante, ocultamos la selección de docente
+    if (rolSelect.value !== "estudiante") {
         grupoDocente.style.display = "none";
         if (docenteInput) docenteInput.required = false;
     } else {
@@ -97,7 +102,6 @@ function cambiarRol() {
         if (docenteInput) docenteInput.required = true;
     }
 }
-// Ejecutar validación inicial
+// Ejecutar validación inicial al cargar la página
 document.addEventListener("DOMContentLoaded", cambiarRol);
 </script>
-{% endblock %}
