@@ -1086,3 +1086,224 @@ body {
 .text-success {
     color: #16a34a !important;
 }
+
+/* --- Estilos específicos para Panel de Docente --- */
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1.25rem;
+}
+
+@media (min-width: 992px) {
+    .col-span-2 {
+        grid-column: span 2;
+    }
+}
+
+/* Badge de Código de Autorización Monoespaciado */
+.code-copy-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.auth-code-badge {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: var(--primary-light);
+    border: 1px solid #bfdbfe;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+}
+
+.btn-copy-code {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.btn-copy-code:hover {
+    background: #f8fafc;
+    color: var(--text-dark);
+    border-color: #cbd5e1;
+}
+
+.uses-counter {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* ==========================================================================
+   MÓDULO DE ESCÁNER QR CON CÁMARA
+   ========================================================================== */
+
+/* Grupo del input + botón de escaneo */
+.input-scanner-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-scanner-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    color: var(--primary);
+    padding: 0 1rem;
+    height: 44px; /* Misma altura ergonómica que el input */
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.btn-scanner-action:hover {
+    background: var(--primary-light);
+    border-color: #bfdbfe;
+}
+
+/* Modal flotante del escáner */
+.scanner-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.scanner-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+}
+
+.scanner-modal-card {
+    position: relative;
+    background: #ffffff;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: modalScaleIn 0.2s ease-out;
+}
+
+@keyframes modalScaleIn {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.scanner-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    background: #f8fafc;
+}
+
+.scanner-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-dark);
+}
+
+.scanner-title h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.scanner-title i {
+    color: var(--primary);
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.btn-close-modal:hover {
+    color: #ef4444;
+}
+
+.scanner-modal-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Visor de video */
+.scanner-viewport {
+    width: 100% !important;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000000;
+}
+
+.scanner-viewport video {
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.scanner-instruction {
+    margin: 0.85rem 0 0 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Animación de destello al autocompletar */
+.input-highlight-pulse {
+    border-color: #16a34a !important;
+    background-color: #f0fdf4 !important;
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.2) !important;
+    transition: all 0.3s ease;
+}
+
+/* Ajuste móvil */
+@media (max-width: 600px) {
+    .input-scanner-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .btn-scanner-action {
+        justify-content: center;
+        width: 100%;
+    }
+}

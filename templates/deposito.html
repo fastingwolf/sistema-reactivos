@@ -2,10 +2,11 @@
 {% block title %}Panel de Depósito - ReactivosLab{% endblock %}
 
 {% block contenido %}
-<!-- Detecta automáticamente si web.py envió 'pendientes', 'solicitudes' o 'solicitudes_pendientes' -->
+<!-- Detecta automáticamente la lista de pendientes enviada por el backend -->
 {% set lista = pendientes or solicitudes or solicitudes_pendientes or [] %}
 
 <div class="table-view-container">
+    <!-- Encabezado de la vista -->
     <div class="view-header">
         <div>
             <a href="/menu" class="back-link">
@@ -13,12 +14,6 @@
             </a>
             <h2 class="view-title">Panel de Depósito</h2>
             <p class="view-subtitle">Supervisión de pedidos pendientes, dispensación y entrega de reactivos</p>
-        </div>
-        <div class="view-actions">
-            <a href="/escaner" class="btn btn-outline">
-                <i class="bi bi-qr-code-scan"></i>
-                <span>Escanear código QR</span>
-            </a>
         </div>
     </div>
 
@@ -112,7 +107,7 @@
         </div>
     </div>
 
-    <!-- 2. Tarjeta: Formulario de Entrega -->
+    <!-- 2. Tarjeta: Formulario de Entrega con botón de escáner QR -->
     <div class="data-card" id="seccion-entrega">
         <div class="card-title-bar">
             <div class="card-title-info">
@@ -124,6 +119,7 @@
 
         <form method="POST" action="/deposito" class="inner-form-padding">
             <div class="form-grid-2">
+                <!-- ID de Solicitud -->
                 <div class="form-group">
                     <label for="solicitud_id">ID de solicitud</label>
                     <div class="input-icon-wrapper">
@@ -132,11 +128,18 @@
                     </div>
                 </div>
 
+                <!-- Código del contenedor con botón para activar cámara -->
                 <div class="form-group">
                     <label for="codigo_contenedor">Código de barras del contenedor</label>
-                    <div class="input-icon-wrapper">
-                        <i class="bi bi-upc-scan"></i>
-                        <input type="text" id="codigo_contenedor" name="codigo_contenedor" placeholder="CNT-XXXXXXXX" required>
+                    <div class="input-scanner-group">
+                        <div class="input-icon-wrapper" style="flex: 1;">
+                            <i class="bi bi-upc-scan"></i>
+                            <input type="text" id="codigo_contenedor" name="codigo_contenedor" placeholder="CNT-XXXXXXXX" required>
+                        </div>
+                        <button type="button" class="btn btn-scanner-action" onclick="abrirEscanerModal()" title="Escanear con cámara">
+                            <i class="bi bi-qr-code-scan"></i>
+                            <span>Escanear</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -151,7 +154,36 @@
     </div>
 </div>
 
+<!-- Modal emergente para la cámara del teléfono -->
+<div id="modalEscaner" class="scanner-modal" style="display: none;">
+    <div class="scanner-modal-backdrop" onclick="cerrarEscanerModal()"></div>
+    <div class="scanner-modal-card">
+        <div class="scanner-modal-header">
+            <div class="scanner-title">
+                <i class="bi bi-camera-fill"></i>
+                <h4>Escanear código QR / Barras</h4>
+            </div>
+            <button type="button" class="btn-close-modal" onclick="cerrarEscanerModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="scanner-modal-body">
+            <!-- Contenedor del visor de cámara -->
+            <div id="qr-reader" class="scanner-viewport"></div>
+            <p class="scanner-instruction">
+                <i class="bi bi-aspect-ratio"></i>
+                Apunta con la cámara hacia el código QR o etiqueta del reactivo.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Librería Html5-QRCode via CDN -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
 <script>
+// Auto-cargar ID de solicitud al pulsar "Despachar"
 function cargarSolicitud(id) {
     const inputId = document.getElementById("solicitud_id");
     const contenedorInput = document.getElementById("codigo_contenedor");
@@ -161,6 +193,86 @@ function cargarSolicitud(id) {
         if (contenedorInput) {
             contenedorInput.focus();
         }
+    }
+}
+
+// Lógica de escaneo con cámara
+let html5QrScanner = null;
+
+// Sonido tipo "beep" al escanear exitosamente
+function emitirBeep() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(850, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    } catch (e) {
+        // En navegadores que bloquean WebAudio sin interacción previa no bloquea la app
+    }
+}
+
+function abrirEscanerModal() {
+    const modal = document.getElementById("modalEscaner");
+    modal.style.display = "flex";
+
+    if (!html5QrScanner) {
+        html5QrScanner = new Html5Qrcode("qr-reader");
+    }
+
+    const config = {
+        fps: 10,
+        qrbox: { width: 240, height: 240 },
+        aspectRatio: 1.0
+    };
+
+    // "facingMode: environment" solicita la cámara trasera del teléfono
+    html5QrScanner.start(
+        { facingMode: "environment" },
+        config,
+        (decodedText, decodedResult) => {
+            emitirBeep();
+            
+            // Si el QR tiene espacios o una URL, extraemos el código limpio
+            let codigoLimpio = decodedText.trim();
+            if (codigoLimpio.includes("/")) {
+                const partes = codigoLimpio.split("/");
+                codigoLimpio = partes[partes.length - 1] || codigoLimpio;
+            }
+
+            const input = document.getElementById("codigo_contenedor");
+            if (input) {
+                input.value = codigoLimpio;
+                input.classList.add("input-highlight-pulse");
+                setTimeout(() => input.classList.remove("input-highlight-pulse"), 1800);
+            }
+
+            cerrarEscanerModal();
+        },
+        (errorMessage) => {
+            // Ignoramos errores de cuadros por segundo mientras busca el código
+        }
+    ).catch(err => {
+        alert("No se pudo iniciar la cámara. Asegúrate de otorgar los permisos de cámara en tu navegador: " + err);
+        cerrarEscanerModal();
+    });
+}
+
+function cerrarEscanerModal() {
+    const modal = document.getElementById("modalEscaner");
+    if (html5QrScanner && html5QrScanner.isScanning) {
+        html5QrScanner.stop().then(() => {
+            modal.style.display = "none";
+        }).catch(() => {
+            modal.style.display = "none";
+        });
+    } else {
+        modal.style.display = "none";
     }
 }
 </script>
