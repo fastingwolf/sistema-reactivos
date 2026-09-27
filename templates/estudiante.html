@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <!-- 1. Tarjeta: Formulario para Nueva Solicitud -->
+    <!-- 1. Tarjeta: Formulario para Nueva Solicitud sincronizado con FastAPI -->
     <div class="data-card mb-4">
         <div class="card-title-bar">
             <div class="card-title-info">
@@ -24,37 +24,37 @@
             <span class="helper-text">Completa los datos autorizados por tu docente</span>
         </div>
 
-        <form method="POST" class="inner-form-padding">
+        <form method="POST" action="/estudiante/solicitar" class="inner-form-padding">
             <div class="form-grid-2">
-                <!-- Selector de Reactivo -->
+                <!-- Selector de Reactivo (Envia el CAS al backend) -->
                 <div class="form-group">
-                    <label for="reactivo_id">Reactivo (CAS)</label>
+                    <label for="cas_reactivo">Reactivo (Fórmula / CAS)</label>
                     <div class="input-icon-wrapper select-wrapper">
                         <i class="bi bi-flask"></i>
-                        <select id="reactivo_id" name="reactivo_id" required>
+                        <select id="cas_reactivo" name="cas_reactivo" required>
                             <option value="" disabled selected>Selecciona un reactivo...</option>
                             {% for r in reactivos %}
-                                <option value="{{ r.id }}">{{ r.nombre }} ({{ r.cas }})</option>
+                                <option value="{{ r.cas }}">{{ r.nombre }} (CAS: {{ r.cas }}) — Unidad: {{ r.unidad }}</option>
                             {% endfor %}
                         </select>
                     </div>
                 </div>
 
-                <!-- Cantidad solicitada -->
+                <!-- Cantidad solicitada (Float requerido por Python) -->
                 <div class="form-group">
-                    <label for="cantidad">Cantidad solicitada</label>
+                    <label for="cantidad">Cantidad numérica</label>
                     <div class="input-icon-wrapper">
                         <i class="bi bi-speedometer2"></i>
-                        <input type="text" id="cantidad" name="cantidad" placeholder="Ej. 50 mL o 10 g" required>
+                        <input type="number" step="any" min="0.01" id="cantidad" name="cantidad" placeholder="Ej. 25.5" required>
                     </div>
                 </div>
 
                 <!-- Laboratorio destino -->
                 <div class="form-group">
-                    <label for="laboratorio">Laboratorio destino</label>
+                    <label for="laboratorio_destino">Laboratorio destino</label>
                     <div class="input-icon-wrapper">
                         <i class="bi bi-geo-alt"></i>
-                        <input type="text" id="laboratorio" name="laboratorio" placeholder="Ej. Laboratorio de Orgánica II" required>
+                        <input type="text" id="laboratorio_destino" name="laboratorio_destino" placeholder="Ej. Laboratorio de Orgánica II" required>
                     </div>
                 </div>
 
@@ -108,7 +108,11 @@
                             {{ s.reactivo.nombre if s.reactivo else (s.nombre_reactivo or "Reactivo #" ~ s.reactivo_id) }}
                         </td>
                         <td><strong>{{ s.cantidad }}</strong></td>
-                        <td><span class="lab-pill"><i class="bi bi-geo-alt-fill"></i> {{ s.laboratorio }}</span></td>
+                        <td>
+                            <span class="lab-pill">
+                                <i class="bi bi-geo-alt-fill"></i> {{ s.laboratorio_destino or s.laboratorio }}
+                            </span>
+                        </td>
                         <td>
                             {% set est = (s.estado | lower) if s.estado else '' %}
                             {% if 'pendiente' in est %}
