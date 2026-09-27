@@ -90,22 +90,22 @@
             </div>
         </a>
 
-        <!-- Directorio de Usuarios -->
-        {% if usuario.rol == 'administrador' or usuario.rol == 'estudiante' %}
-        <a href="/usuarios" class="module-card">
-            <div class="card-icon card-icon-slate">
-                <i class="bi bi-people"></i>
-            </div>
-            <div class="card-content">
-                <h3>Directorio de Usuarios</h3>
-                <p>Consulta la lista de integrantes del laboratorio, docentes y personal de soporte.</p>
-            </div>
-            <div class="card-action">
-                <span>Consultar</span>
-                <i class="bi bi-arrow-right"></i>
-            </div>
-        </a>
-        {% endif %}
+        <!-- Directorio de Usuarios (Solo accesible por Administradores) -->
+{% if usuario.rol == 'administrador' %}
+<a href="/usuarios" class="module-card">
+    <div class="card-icon card-icon-slate">
+        <i class="bi bi-people"></i>
+    </div>
+    <div class="card-content">
+        <h3>Directorio de Usuarios</h3>
+        <p>Consulta y administra la lista de integrantes del laboratorio y docentes.</p>
+    </div>
+    <div class="card-action">
+        <span>Gestionar</span>
+        <i class="bi bi-arrow-right"></i>
+    </div>
+</a>
+{% endif %}
 
     </div>
 </div>

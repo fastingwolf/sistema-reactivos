@@ -1,51 +1,148 @@
 {% extends "base.html" %}
-{% block title %}Panel estudiante{% endblock %}
+{% block title %}Panel de Estudiante - ReactivosLab{% endblock %}
 
 {% block contenido %}
-<h2>Panel de estudiante</h2>
+<div class="table-view-container">
+    <!-- Encabezado de la vista -->
+    <div class="view-header">
+        <div>
+            <a href="/menu" class="back-link">
+                <i class="bi bi-arrow-left"></i> Volver al panel
+            </a>
+            <h2 class="view-title">Panel de Estudiante</h2>
+            <p class="view-subtitle">Solicita reactivos para tus prácticas y haz seguimiento a tus autorizaciones</p>
+        </div>
+    </div>
 
-<h3>Nueva solicitud de reactivo</h3>
-<form method="post" action="/estudiante/solicitar">
-    <label>Reactivo (CAS)</label>
-    <select name="cas_reactivo" required>
-        {% for r in reactivos %}
-        <option value="{{ r.cas }}">{{ r.nombre }} ({{ r.cas }})</option>
-        {% endfor %}
-    </select>
+    <!-- 1. Tarjeta: Formulario para Nueva Solicitud -->
+    <div class="data-card mb-4">
+        <div class="card-title-bar">
+            <div class="card-title-info">
+                <i class="bi bi-journal-plus title-icon"></i>
+                <h3>Nueva solicitud de reactivo</h3>
+            </div>
+            <span class="helper-text">Completa los datos autorizados por tu docente</span>
+        </div>
 
-    <label>Cantidad solicitada</label>
-    <input type="number" step="0.01" name="cantidad" required>
+        <form method="POST" class="inner-form-padding">
+            <div class="form-grid-2">
+                <!-- Selector de Reactivo -->
+                <div class="form-group">
+                    <label for="reactivo_id">Reactivo (CAS)</label>
+                    <div class="input-icon-wrapper select-wrapper">
+                        <i class="bi bi-flask"></i>
+                        <select id="reactivo_id" name="reactivo_id" required>
+                            <option value="" disabled selected>Selecciona un reactivo...</option>
+                            {% for r in reactivos %}
+                                <option value="{{ r.id }}">{{ r.nombre }} ({{ r.cas }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
 
-    <label>Laboratorio destino</label>
-    <input type="text" name="laboratorio_destino" required>
+                <!-- Cantidad solicitada -->
+                <div class="form-group">
+                    <label for="cantidad">Cantidad solicitada</label>
+                    <div class="input-icon-wrapper">
+                        <i class="bi bi-speedometer2"></i>
+                        <input type="text" id="cantidad" name="cantidad" placeholder="Ej. 50 mL o 10 g" required>
+                    </div>
+                </div>
 
-    <label>Código de autorización</label>
-    <input type="text" name="codigo_autorizacion" required placeholder="AUT-XXXX-XXXX">
+                <!-- Laboratorio destino -->
+                <div class="form-group">
+                    <label for="laboratorio">Laboratorio destino</label>
+                    <div class="input-icon-wrapper">
+                        <i class="bi bi-geo-alt"></i>
+                        <input type="text" id="laboratorio" name="laboratorio" placeholder="Ej. Laboratorio de Orgánica II" required>
+                    </div>
+                </div>
 
-    <button type="submit">Crear solicitud</button>
-</form>
+                <!-- Código de autorización -->
+                <div class="form-group">
+                    <label for="codigo_autorizacion">Código de autorización</label>
+                    <div class="input-icon-wrapper">
+                        <i class="bi bi-key"></i>
+                        <input type="text" id="codigo_autorizacion" name="codigo_autorizacion" placeholder="AUT-XXXX-XXXX" required>
+                    </div>
+                </div>
+            </div>
 
-<h3>Mis solicitudes</h3>
+            <div class="form-actions-right">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-send-check"></i>
+                    <span>Crear solicitud</span>
+                </button>
+            </div>
+        </form>
+    </div>
 
-{% if mensaje %}<div class="alerta alerta-exito">{{ mensaje }}</div>{% endif %}
-{% if error %}<div class="alerta alerta-error">{{ error }}</div>{% endif %}
+    <!-- 2. Tarjeta: Historial de Solicitudes -->
+    <div class="data-card">
+        <div class="card-title-bar">
+            <div class="card-title-info">
+                <i class="bi bi-clock-history title-icon"></i>
+                <h3>Mis solicitudes</h3>
+            </div>
+            <div class="counter-badge">
+                Total: {{ solicitudes | length }} registrada{% if solicitudes | length != 1 %}s{% endif %}
+            </div>
+        </div>
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Reactivo</th>
-        <th>Cantidad</th>
-        <th>Laboratorio</th>
-        <th>Estado</th>
-    </tr>
-    {% for s in solicitudes %}
-    <tr>
-        <td>{{ s.id }}</td>
-        <td>{{ s.detalles[0].reactivo.nombre }}</td>
-        <td>{{ s.detalles[0].cantidad_solicitada }}</td>
-        <td>{{ s.laboratorio_destino }}</td>
-        <td>{{ s.estado }}</td>
-    </tr>
-    {% endfor %}
-</table>
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th>Reactivo</th>
+                        <th>Cantidad</th>
+                        <th>Laboratorio</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in solicitudes %}
+                    <tr class="table-row">
+                        <td class="cell-id">#{{ s.id }}</td>
+                        <td class="cell-name">
+                            {{ s.reactivo.nombre if s.reactivo else (s.nombre_reactivo or "Reactivo #" ~ s.reactivo_id) }}
+                        </td>
+                        <td><strong>{{ s.cantidad }}</strong></td>
+                        <td><span class="lab-pill"><i class="bi bi-geo-alt-fill"></i> {{ s.laboratorio }}</span></td>
+                        <td>
+                            {% set est = (s.estado | lower) if s.estado else '' %}
+                            {% if 'pendiente' in est %}
+                                <span class="status-badge status-pending">
+                                    <i class="bi bi-hourglass-split"></i> {{ s.estado }}
+                                </span>
+                            {% elif 'aprobad' in est or 'autorizad' in est %}
+                                <span class="status-badge status-approved">
+                                    <i class="bi bi-check-circle-fill"></i> {{ s.estado }}
+                                </span>
+                            {% elif 'rechazad' in est or 'denegad' in est %}
+                                <span class="status-badge status-rejected">
+                                    <i class="bi bi-x-circle-fill"></i> {{ s.estado }}
+                                </span>
+                            {% elif 'entregad' in est %}
+                                <span class="status-badge status-delivered">
+                                    <i class="bi bi-box2-check-fill"></i> {{ s.estado }}
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-neutral">{{ s.estado }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="empty-state-cell">
+                            <i class="bi bi-inbox empty-icon"></i>
+                            <p>No has registrado ninguna solicitud de reactivos todavía.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
