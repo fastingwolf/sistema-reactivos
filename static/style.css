@@ -849,3 +849,177 @@ body {
 .status-rejected { background-color: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 .status-delivered { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
 .status-neutral { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+/* ==========================================================================
+   ADAPTACIONES RESPONSIVAS PARA DISPOSITIVOS MÓVILES (TABLETS Y SMARTPHONES)
+   ========================================================================== */
+
+/* 1. Prevenir zoom automático molesto en iPhone/Safari al tocar inputs */
+@media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    select {
+        font-size: 16px !important; /* iOS no hace zoom automático si es >= 16px */
+    }
+}
+
+/* 2. Tablets y pantallas medianas (máximo 860px) */
+@media (max-width: 860px) {
+    .nav-container {
+        padding: 0 1rem;
+        height: auto;
+        min-height: 60px;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .nav-left {
+        width: 100%;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .nav-links {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 4px;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Oculta barra de scroll en Firefox */
+    }
+    .nav-links::-webkit-scrollbar {
+        display: none; /* Oculta barra de scroll en Chrome/Safari */
+    }
+
+    .nav-right {
+        width: 100%;
+        justify-content: space-between;
+        padding-top: 0.4rem;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .page-container,
+    .table-view-container,
+    .dashboard-section {
+        padding: 0 0.85rem;
+        margin: 1.25rem auto 2.5rem auto;
+    }
+}
+
+/* 3. Teléfonos móviles (máximo 600px) */
+@media (max-width: 600px) {
+    /* Encabezados y títulos de vista */
+    .view-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .view-title {
+        font-size: 1.35rem;
+    }
+
+    .view-subtitle {
+        font-size: 0.825rem;
+    }
+
+    .view-actions {
+        width: 100%;
+    }
+
+    .view-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Cuadrícula de tarjetas del menú principal */
+    .cards-grid {
+        grid-template-columns: 1fr; /* Una tarjeta por fila en vertical */
+        gap: 1rem;
+    }
+
+    .module-card {
+        padding: 1.25rem;
+    }
+
+    /* Formularios en una sola columna */
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .inner-form-padding {
+        padding: 1.25rem 1rem;
+    }
+
+    .card-title-bar {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+    }
+
+    .form-actions-right {
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .form-actions-right .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Barra de búsqueda de reactivos */
+    .table-search-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 0.85rem 1rem;
+    }
+
+    .search-input-wrapper {
+        max-width: 100%;
+    }
+
+    .counter-badge {
+        align-self: flex-start;
+    }
+
+    /* Tablas con desplazamiento suave táctil */
+    .table-responsive {
+        border-radius: 0;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -1px;
+    }
+
+    .custom-table th,
+    .custom-table td {
+        padding: 0.75rem 0.85rem;
+        font-size: 0.82rem;
+    }
+
+    /* Autenticación (Login y Registro) */
+    .auth-wrapper {
+        padding: 0.75rem;
+        min-height: calc(100vh - 120px);
+    }
+
+    .auth-card {
+        padding: 1.5rem 1.15rem;
+        border-radius: 14px;
+    }
+
+    .auth-header h2 {
+        font-size: 1.35rem;
+    }
+
+    /* Alertas */
+    .alerta {
+        font-size: 0.85rem;
+        padding: 0.75rem 1rem;
+    }
+}
