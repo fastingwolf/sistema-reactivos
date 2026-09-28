@@ -72,11 +72,10 @@ def listar_solicitudes_por_estudiante(session, estudiante):
     return session.query(Solicitud).filter_by(estudiante_id=estudiante.id).all()
 
 def listar_solicitudes_entregadas(session, limite: int = 50):
-    """Devuelve las últimas solicitudes entregadas para trazabilidad del depósito."""
     return (
         session.query(Solicitud)
         .filter(Solicitud.estado == "entregada")
-        .order_by(Solicitud.fecha_entrega.desc())
+        .order_by(Solicitud.id.desc())
         .limit(limite)
         .all()
     )

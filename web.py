@@ -250,19 +250,22 @@ def panel_deposito(request: Request, db: Session = Depends(get_db)):
     usuario = usuario_actual(request, db)
     if not usuario or usuario.rol != "deposito":
         return RedirectResponse(url="/login", status_code=303)
+
     return templates.TemplateResponse("deposito.html", {
         "request": request,
         "usuario": usuario,
-        "pendientes": listar_solicitudes_pendientes(db)
+        "pendientes": listar_solicitudes_pendientes(db),
         "entregadas": listar_solicitudes_entregadas(db)
     })
 
 
 @router.post("/deposito/entregar")
-def entregar_web(request: Request,
-                 solicitud_id: int = Form(...),
-                 codigo_contenedor: str = Form(...),
-                 db: Session = Depends(get_db)):
+def entregar_web(
+    request: Request,
+    solicitud_id: int = Form(...),
+    codigo_contenedor: str = Form(...),
+    db: Session = Depends(get_db)
+):
     usuario = usuario_actual(request, db)
     if not usuario or usuario.rol != "deposito":
         return RedirectResponse(url="/login", status_code=303)
@@ -287,6 +290,7 @@ def entregar_web(request: Request,
         "request": request,
         "usuario": usuario,
         "pendientes": listar_solicitudes_pendientes(db),
+        "entregadas": listar_solicitudes_entregadas(db),
         "mensaje": msg,
         "error": err
     })
