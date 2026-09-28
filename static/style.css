@@ -1307,3 +1307,56 @@ body {
         width: 100%;
     }
 }
+
+/* --- Enlace e interactividad en Peligrosidad (FDS) --- */
+.hazard-link {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.hazard-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hazard-high {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.hazard-medium {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.hazard-low {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+/* Efecto al pasar el ratón */
+.hazard-link:hover .hazard-badge {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    filter: brightness(0.96);
+}
+
+.external-icon {
+    font-size: 0.65rem;
+    opacity: 0.65;
+    margin-left: 0.15rem;
+}
+
+.hazard-link:hover .external-icon {
+    opacity: 1;
+}

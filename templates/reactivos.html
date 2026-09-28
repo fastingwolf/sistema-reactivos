@@ -61,18 +61,37 @@
                             {% endif %}
                         </td>
                         <td class="cell-unit"><span class="unit-badge">{{ r.unidad }}</span></td>
-                        <td class="cell-hazard">
-                            {% set p = (r.peligrosidad | lower) if r.peligrosidad else '' %}
-                            {% if p == 'alta' or p == 'muy alta' %}
-                                <span class="hazard-badge hazard-high"><i class="bi bi-exclamation-octagon-fill"></i> {{ r.peligrosidad }}</span>
-                            {% elif p == 'media' %}
-                                <span class="hazard-badge hazard-medium"><i class="bi bi-exclamation-triangle-fill"></i> {{ r.peligrosidad }}</span>
-                            {% elif p == 'baja' %}
-                                <span class="hazard-badge hazard-low"><i class="bi bi-shield-check"></i> {{ r.peligrosidad }}</span>
-                            {% else %}
-                                <span class="hazard-badge hazard-neutral">{{ r.peligrosidad or 'No def.' }}</span>
-                            {% endif %}
-                        </td>
+                        <!-- Columna de Peligrosidad como enlace a la Hoja de Seguridad (FDS) -->
+<td>
+    <!-- Enlace a PubChem mediante el CAS; si el reactivo tuviera una URL propia asignada, la prioriza -->
+    <a href="{{ r.hoja_seguridad_url if r.hoja_seguridad_url else 'https://pubchem.ncbi.nlm.nih.gov/#query=' ~ r.cas }}" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       class="hazard-link" 
+       title="Abrir Hoja de Datos de Seguridad (FDS / LCSS) para CAS {{ r.cas }}">
+       
+        {% set pel = (r.peligrosidad | lower) if r.peligrosidad else 'baja' %}
+        {% if pel == 'alta' %}
+            <span class="hazard-badge hazard-high">
+                <i class="bi bi-exclamation-octagon-fill"></i>
+                <span>Alta</span>
+                <i class="bi bi-box-arrow-up-right external-icon"></i>
+            </span>
+        {% elif pel == 'media' %}
+            <span class="hazard-badge hazard-medium">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>Media</span>
+                <i class="bi bi-box-arrow-up-right external-icon"></i>
+            </span>
+        {% else %}
+            <span class="hazard-badge hazard-low">
+                <i class="bi bi-shield-check"></i>
+                <span>Baja</span>
+                <i class="bi bi-box-arrow-up-right external-icon"></i>
+            </span>
+        {% endif %}
+    </a>
+</td>
                         <td class="cell-qr">
                             {% if r.contenedores and r.contenedores | length > 0 %}
                                 <div class="qr-chips-container">
