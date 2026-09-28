@@ -116,6 +116,102 @@
             </div>
             <span class="helper-text">Registra la salida física del frasco o contenedor</span>
         </div>
+        <!-- ========================================================= -->
+<!-- HISTORIAL DE SOLICITUDES ENTREGADAS Y TRAZABILIDAD        -->
+<!-- ========================================================= -->
+<div class="data-card mt-5">
+    <div class="card-header-flex">
+        <div>
+            <div class="card-title-icon-wrap">
+                <i class="bi bi-clock-history text-success"></i>
+                <h3 style="margin: 0;">Historial de salidas entregadas</h3>
+            </div>
+            <p class="view-subtitle" style="margin: 4px 0 0 0;">
+                Registro de reactivos despachados, frasco utilizado y solicitante
+            </p>
+        </div>
+        <span class="counter-pill">
+            {{ entregadas | length }} registro{% if entregadas | length != 1 %}s{% endif %}
+        </span>
+    </div>
+
+    <div class="table-responsive mt-3">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th style="width: 70px;">ID</th>
+                    <th>FECHA Y HORA</th>
+                    <th>SOLICITANTE</th>
+                    <th>REACTIVO</th>
+                    <th>CANTIDAD SALIDA</th>
+                    <th>FRASCO / QR</th>
+                    <th>UBICACIÓN EN DEPÓSITO</th>
+                    <th>ESTADO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in entregadas %}
+                    {% for d in s.detalles %}
+                    <tr class="table-row">
+                        <td class="cell-id">#{{ s.id }}</td>
+                        <td>
+                            <div class="datetime-cell">
+                                <i class="bi bi-calendar3"></i>
+                                <span>{{ s.fecha_entrega.strftime('%d/%m/%Y %H:%M') if s.fecha_entrega else '—' }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="user-badge">
+                                <i class="bi bi-person-circle"></i>
+                                <strong>{{ s.estudiante.nombre if s.estudiante else 'Estudiante' }}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <strong>{{ d.reactivo.nombre if d.reactivo else 'Reactivo' }}</strong>
+                            {% if d.reactivo and d.reactivo.cas %}
+                                <br><small class="text-muted">CAS: {{ d.reactivo.cas }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="stock-badge stock-dispatched">
+                                <i class="bi bi-dash-circle-fill"></i>
+                                <strong>{{ d.cantidad_entregada }}</strong> {{ d.reactivo.unidad if d.reactivo else '' }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if d.contenedor %}
+                                <div class="container-badge-pill">
+                                    <span class="container-serial">{{ d.contenedor.codigo_barras }}</span>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="location-cell">
+                                <i class="bi bi-geo-alt-fill text-primary"></i>
+                                <span>{{ d.contenedor.ubicacion if (d.contenedor and d.contenedor.ubicacion) else 'Depósito Central' }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-status-delivered">
+                                <i class="bi bi-check-all"></i> Entregada
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="8" class="empty-state-cell">
+                        <i class="bi bi-inbox empty-icon"></i>
+                        <p>No se han registrado entregas todavía.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
         <!-- CAMBIAR action="/deposito" POR action="/deposito/entregar" -->
 <form method="POST" action="/deposito/entregar" class="inner-form-padding">

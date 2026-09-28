@@ -11,10 +11,12 @@ from usuarios import buscar_por_correo
 from reactivos import (listar_reactivos, buscar_reactivo_por_cas,
                        buscar_contenedor_por_codigo)
 from auth_codes import crear_codigo_autorizacion
-from solicitudes import (crear_solicitud, entregar_solicitud,
-                         listar_solicitudes_pendientes)
+from solicitudes import (
+    listar_solicitudes_pendientes,
+    listar_solicitudes_entregadas,
+    entregar_solicitud
+)
 from models import Usuario, CodigoAutorizacion, Solicitud
-
 
 router = APIRouter()
 templates = Jinja2Blocks(directory="templates")
@@ -252,6 +254,7 @@ def panel_deposito(request: Request, db: Session = Depends(get_db)):
         "request": request,
         "usuario": usuario,
         "pendientes": listar_solicitudes_pendientes(db)
+        "entregadas": listar_solicitudes_entregadas(db)
     })
 
 
