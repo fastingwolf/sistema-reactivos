@@ -117,40 +117,41 @@
             <span class="helper-text">Registra la salida física del frasco o contenedor</span>
         </div>
 
-        <form method="POST" action="/deposito" class="inner-form-padding">
-            <div class="form-grid-2">
-                <!-- ID de Solicitud -->
-                <div class="form-group">
-                    <label for="solicitud_id">ID de solicitud</label>
-                    <div class="input-icon-wrapper">
-                        <i class="bi bi-hash"></i>
-                        <input type="number" id="solicitud_id" name="solicitud_id" placeholder="Ej. 1" required>
-                    </div>
-                </div>
-
-                <!-- Código del contenedor con botón para activar cámara -->
-                <div class="form-group">
-                    <label for="codigo_contenedor">Código de barras del contenedor</label>
-                    <div class="input-scanner-group">
-                        <div class="input-icon-wrapper" style="flex: 1;">
-                            <i class="bi bi-upc-scan"></i>
-                            <input type="text" id="codigo_contenedor" name="codigo_contenedor" placeholder="CNT-XXXXXXXX" required>
-                        </div>
-                        <button type="button" class="btn btn-scanner-action" onclick="abrirEscanerModal()" title="Escanear con cámara">
-                            <i class="bi bi-qr-code-scan"></i>
-                            <span>Escanear</span>
-                        </button>
-                    </div>
-                </div>
+        <!-- CAMBIAR action="/deposito" POR action="/deposito/entregar" -->
+<form method="POST" action="/deposito/entregar" class="inner-form-padding">
+    <div class="form-grid-2">
+        <!-- ID de Solicitud -->
+        <div class="form-group">
+            <label for="solicitud_id">ID de solicitud</label>
+            <div class="input-icon-wrapper">
+                <i class="bi bi-hash"></i>
+                <input type="number" id="solicitud_id" name="solicitud_id" placeholder="Ej. 1" required>
             </div>
+        </div>
 
-            <div class="form-actions-right">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-check2-circle"></i>
-                    <span>Confirmar entrega</span>
+        <!-- Código del contenedor con botón para activar cámara -->
+        <div class="form-group">
+            <label for="codigo_contenedor">Código de barras del contenedor</label>
+            <div class="input-scanner-group">
+                <div class="input-icon-wrapper" style="flex: 1;">
+                    <i class="bi bi-upc-scan"></i>
+                    <input type="text" id="codigo_contenedor" name="codigo_contenedor" placeholder="CNT-XXXXXXXX" required>
+                </div>
+                <button type="button" class="btn btn-scanner-action" onclick="abrirEscanerModal()" title="Escanear con cámara">
+                    <i class="bi bi-qr-code-scan"></i>
+                    <span>Escanear</span>
                 </button>
             </div>
-        </form>
+        </div>
+    </div>
+
+    <div class="form-actions-right">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check2-circle"></i>
+            <span>Confirmar entrega</span>
+        </button>
+    </div>
+</form>
     </div>
 </div>
 
