@@ -109,27 +109,38 @@
                             </a>
                         </td>
 
-                        <!-- Contenedores y Códigos QR -->
-                        <td>
-                            {% set frascos = r.contenedores if r.contenedores is defined else [] %}
-                            {% if frascos and frascos | length > 0 %}
-                                <div class="containers-wrap">
-                                    {% for c in frascos %}
-                                    <div class="container-chip">
-                                        <span class="container-code">{{ c.codigo_barras }}</span>
-                                        <a href="/qr/{{ c.codigo_barras }}" target="_blank" class="chip-btn" title="Ver código QR">
-                                            <i class="bi bi-qr-code"></i>
-                                        </a>
-                                        <a href="/qr/{{ c.codigo_barras }}?descargar=1" class="chip-btn" title="Descargar etiqueta">
-                                            <i class="bi bi-download"></i>
-                                        </a>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <span class="text-muted" style="font-size: 0.8rem; font-style: italic;">Sin contenedor asignado</span>
-                            {% endif %}
-                        </td>
+<!-- Columna CONTENEDORES & QR: Código del frasco y visualizador de etiqueta -->
+<td>
+    {% set frascos = r.contenedores if r.contenedores is defined else [] %}
+    {% if frascos and frascos | length > 0 %}
+        <div class="containers-cell-wrapper">
+            {% for c in frascos %}
+            <div class="container-badge-pill">
+                <span class="container-serial">{{ c.codigo_barras }}</span>
+                <button type="button" 
+                        class="btn-qr-view" 
+                        onclick="abrirModalQR('{{ c.codigo_barras }}', '{{ r.nombre }}', '{{ r.cas }}')" 
+                        title="Ver e imprimir etiqueta QR">
+                    <i class="bi bi-qr-code"></i>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <span class="text-muted" style="font-size: 0.8rem; font-style: italic;">Sin código</span>
+    {% endif %}
+</td>
+        {% endfor %}
+
+        <!-- Botón '+' para agregar un nuevo contenedor/frasco a este reactivo -->
+        <button type="button" 
+                class="btn-add-container-plus" 
+                onclick="abrirModalNuevoContenedor('{{ r.id }}', '{{ r.nombre }}', '{{ r.unidad }}')" 
+                title="Añadir nuevo frasco/contenedor a este reactivo">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+    </div>
+</td>   
                     </tr>
                     {% else %}
                     <tr>
@@ -171,5 +182,264 @@ function filtrarTabla() {
         contador.innerText = `Total: ${visibles} reactivo${visibles !== 1 ? 's' : ''}`;
     }
 }
+</script>
+<!-- 1. Modal para Visualizar y Descargar el Código QR -->
+<div id="modalVerQR" class="custom-modal-backdrop" style="display: none;">
+    <div class="custom-modal-card">
+        <div class="custom-modal-header">
+            <div class="modal-header-info">
+                <i class="bi bi-qr-code text-primary"></i>
+                <h4 id="qrModalTitulo">Código QR del Contenedor</h4>
+            </div>
+            <button type="button" class="btn-close-clean" onclick="cerrarModalQR()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="custom-modal-body qr-modal-center">
+            <div class="qr-preview-box">
+                <img id="imgCodigoQR" src="" alt="Cargando código QR..." class="qr-img-render">
+            </div>
+            <span class="qr-serial-display" id="qrModalSerial">CNT-XXXXXXXX</span>
+            <p class="qr-reagent-name" id="qrModalReactivo">Reactivo</p>
+            
+            <div class="modal-actions-row">
+                <a id="btnDescargaDirecta" href="#" class="btn btn-primary btn-sm" download>
+                    <i class="bi bi-download"></i>
+                    <span>Descargar imagen</span>
+                </a>
+                <button type="button" class="btn btn-outline btn-sm" onclick="imprimirQR()">
+                    <i class="bi bi-printer"></i>
+                    <span>Imprimir</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Modal para Agregar Nuevo Contenedor (+) -->
+<div id="modalNuevoContenedor" class="custom-modal-backdrop" style="display: none;">
+    <div class="custom-modal-card">
+        <div class="custom-modal-header">
+            <div class="modal-header-info">
+                <i class="bi bi-box-seam text-primary"></i>
+                <h4 id="nuevoContenedorTitulo">Registrar nuevo contenedor</h4>
+            </div>
+            <button type="button" class="btn-close-clean" onclick="cerrarModalNuevoContenedor()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <form method="POST" id="formNuevoContenedor" action="" class="inner-form-padding">
+            <p class="modal-instruction" id="nuevoContenedorSubtitulo">Añadir existencias físicas al inventario</p>
+            
+            <div class="form-group mb-3">
+                <label for="inputCantidad">Cantidad inicial (<span id="spanUnidad">g</span>)</label>
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-speedometer2"></i>
+                    <input type="number" step="any" min="0.1" id="inputCantidad" name="cantidad" placeholder="Ej. 500" required>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="inputLote">Número de Lote (opcional)</label>
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-tag"></i>
+                    <input type="text" id="inputLote" name="lote" placeholder="Ej. L2026-05">
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="inputUbicacion">Ubicación física en el laboratorio</label>
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-geo-alt"></i>
+                    <input type="text" id="inputUbicacion" name="ubicacion" placeholder="Ej. Depósito B - Estante 2" value="Depósito">
+                </div>
+            </div>
+
+            <div class="form-actions-right">
+                <button type="button" class="btn btn-outline btn-sm" onclick="cerrarModalNuevoContenedor()">Cancelar</button>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-check-lg"></i>
+                    <span>Crear Contenedor</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Lógica para desplegar el Código QR
+function abrirModalQR(codigo, nombre, cas) {
+    const modal = document.getElementById("modalVerQR");
+    const img = document.getElementById("imgCodigoQR");
+    const serial = document.getElementById("qrModalSerial");
+    const reactivo = document.getElementById("qrModalReactivo");
+    const btnDescarga = document.getElementById("btnDescargaDirecta");
+
+    const urlQR = `/qr/${codigo}?descargar=1`;
+    img.src = urlQR;
+    serial.innerText = codigo;
+    reactivo.innerText = `${nombre} (CAS: ${cas})`;
+    btnDescarga.href = urlQR;
+    btnDescarga.setAttribute("download", `QR-${codigo}.png`);
+
+    modal.style.display = "flex";
+}
+
+function cerrarModalQR() {
+    document.getElementById("modalVerQR").style.display = "none";
+}
+
+function imprimirQR() {
+    const imgUrl = document.getElementById("imgCodigoQR").src;
+    const serial = document.getElementById("qrModalSerial").innerText;
+    const ventana = window.open('', '_blank');
+    ventana.document.write(`
+        <html><head><title>Imprimir QR - ${serial}</title>
+        <style>
+            body { display:flex; flex-direction:column; align-items:center; justify-content:center; height:90vh; font-family:sans-serif; }
+            img { width: 220px; height: 220px; }
+            h2 { margin: 10px 0 5px; font-family: monospace; }
+        </style></head><body>
+            <img src="${imgUrl}" onload="window.print(); window.close();" />
+            <h2>${serial}</h2>
+        </body></html>
+    `);
+}
+
+// Lógica para registrar un nuevo contenedor (+)
+function abrirModalNuevoContenedor(reactivoId, nombre, unidad) {
+    const modal = document.getElementById("modalNuevoContenedor");
+    const titulo = document.getElementById("nuevoContenedorTitulo");
+    const form = document.getElementById("formNuevoContenedor");
+    const spanUnidad = document.getElementById("spanUnidad");
+
+    titulo.innerText = `Nuevo frasco: ${nombre}`;
+    spanUnidad.innerText = unidad || 'unidad';
+    form.action = `/reactivos/${reactivoId}/contenedor`;
+
+    modal.style.display = "flex";
+}
+
+function cerrarModalNuevoContenedor() {
+    document.getElementById("modalNuevoContenedor").style.display = "none";
+}
+
+// Cerrar modales con clic fuera o tecla Escape
+window.addEventListener("click", (e) => {
+    const mQR = document.getElementById("modalVerQR");
+    const mCont = document.getElementById("modalNuevoContenedor");
+    if (e.target === mQR) mQR.style.display = "none";
+    if (e.target === mCont) mCont.style.display = "none";
+});
+window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        document.getElementById("modalVerQR").style.display = "none";
+        document.getElementById("modalNuevoContenedor").style.display = "none";
+    }
+});
+</script>
+<!-- Modal para Visualizar e Imprimir la Etiqueta QR del Frasco -->
+<div id="modalVerQR" class="custom-modal-backdrop" style="display: none;">
+    <div class="custom-modal-card">
+        <div class="custom-modal-header">
+            <div class="modal-header-info">
+                <i class="bi bi-qr-code text-primary"></i>
+                <h4>Etiqueta QR del Frasco</h4>
+            </div>
+            <button type="button" class="btn-close-clean" onclick="cerrarModalQR()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="custom-modal-body qr-modal-center">
+            <div class="qr-preview-box">
+                <img id="imgCodigoQR" src="" alt="Código QR" class="qr-img-render">
+            </div>
+            <span class="qr-serial-display" id="qrModalSerial">CNT-XXXXXXXX</span>
+            <p class="qr-reagent-name" id="qrModalReactivo">Reactivo</p>
+            
+            <div class="modal-actions-row">
+                <button type="button" class="btn btn-primary btn-sm" onclick="imprimirQR()">
+                    <i class="bi bi-printer"></i>
+                    <span>Imprimir etiqueta</span>
+                </button>
+                <a id="btnDescargaDirecta" href="#" class="btn btn-outline btn-sm" download>
+                    <i class="bi bi-download"></i>
+                    <span>Descargar imagen</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function abrirModalQR(codigo, nombre, cas) {
+    const modal = document.getElementById("modalVerQR");
+    const img = document.getElementById("imgCodigoQR");
+    const serial = document.getElementById("qrModalSerial");
+    const reactivo = document.getElementById("qrModalReactivo");
+    const btnDescarga = document.getElementById("btnDescargaDirecta");
+
+    const urlQR = `/qr/${codigo}?descargar=1`;
+    img.src = urlQR;
+    serial.innerText = codigo;
+    reactivo.innerText = `${nombre} (CAS: ${cas})`;
+    btnDescarga.href = urlQR;
+    btnDescarga.setAttribute("download", `Etiqueta-${codigo}.png`);
+
+    modal.style.display = "flex";
+}
+
+function cerrarModalQR() {
+    document.getElementById("modalVerQR").style.display = "none";
+}
+
+function imprimirQR() {
+    const imgUrl = document.getElementById("imgCodigoQR").src;
+    const serial = document.getElementById("qrModalSerial").innerText;
+    const reactivo = document.getElementById("qrModalReactivo").innerText;
+    const ventana = window.open('', '_blank');
+    ventana.document.write(`
+        <html>
+        <head>
+            <title>Imprimir Etiqueta - ${serial}</title>
+            <style>
+                body { 
+                    display: flex; 
+                    flex-direction: column; 
+                    align-items: center; 
+                    justify-content: center; 
+                    height: 90vh; 
+                    font-family: Arial, sans-serif; 
+                }
+                .label-box {
+                    border: 2px dashed #000;
+                    padding: 16px;
+                    border-radius: 8px;
+                    text-align: center;
+                }
+                img { width: 200px; height: 200px; display: block; margin: 0 auto; }
+                h2 { margin: 10px 0 4px; font-family: monospace; font-size: 20px; }
+                p { margin: 0; font-size: 14px; font-weight: bold; color: #333; }
+            </style>
+        </head>
+        <body>
+            <div class="label-box">
+                <img src="${imgUrl}" onload="window.print(); window.close();" />
+                <h2>${serial}</h2>
+                <p>${reactivo}</p>
+            </div>
+        </body>
+        </html>
+    `);
+}
+
+// Cerrar con clic en el fondo oscuro o con tecla Escape
+window.addEventListener("click", (e) => {
+    const mQR = document.getElementById("modalVerQR");
+    if (e.target === mQR) cerrarModalQR();
+});
+window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") cerrarModalQR();
+});
 </script>
 {% endblock %}
