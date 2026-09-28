@@ -137,7 +137,7 @@
         <div class="custom-modal-header">
             <div class="modal-header-info">
                 <i class="bi bi-qr-code text-primary"></i>
-                <h4>Etiqueta QR del Frasco</h4>
+                <h4 style="margin: 0; font-size: 1rem;">Etiqueta QR del Frasco</h4>
             </div>
             <button type="button" class="btn-close-clean" onclick="cerrarModalQR()">
                 <i class="bi bi-x-lg"></i>
@@ -145,9 +145,9 @@
         </div>
         <div class="custom-modal-body qr-modal-center">
             <div class="qr-preview-box">
-        <!-- El QR se genera aquí directamente en alta calidad -->
-    <div id="contenedorCanvasQR" style="display: flex; justify-content: center;"></div>
-</div>
+                <!-- Etiqueta de imagen con el ID exacto que espera JavaScript -->
+                <img id="imgCodigoQR" src="" alt="Código QR" class="qr-img-render">
+            </div>
             <span class="qr-serial-display" id="qrModalSerial">CNT-XXXXXXXX</span>
             <p class="qr-reagent-name" id="qrModalReactivo">Reactivo</p>
             
@@ -166,7 +166,7 @@
 </div>
 
 <script>
-// Visualización del Código QR en modal
+// Visualización del Código QR servido desde /qr/{codigo}.png
 function abrirModalQR(codigo, nombre, cas) {
     const modal = document.getElementById("modalVerQR");
     const img = document.getElementById("imgCodigoQR");
@@ -174,27 +174,53 @@ function abrirModalQR(codigo, nombre, cas) {
     const reactivo = document.getElementById("qrModalReactivo");
     const btnDescarga = document.getElementById("btnDescargaDirecta");
 
-    const urlQR = "/qr/" + codigo + "?descargar=1";
+    if (!modal || !img) {
+        console.error("No se encontró el modal o la etiqueta img en el DOM");
+        return;
+    }
+
+    // Ruta exacta del backend que genera el PNG
+    const urlQR = "/qr/" + encodeURIComponent(codigo) + ".png";
     img.src = urlQR;
-    serial.innerText = codigo;
-    reactivo.innerText = nombre + " (CAS: " + cas + ")";
-    btnDescarga.href = urlQR;
-    btnDescarga.setAttribute("download", "Etiqueta-" + codigo + ".png");
+    if (serial) serial.innerText = codigo;
+    if (reactivo) reactivo.innerText = nombre + " (CAS: " + cas + ")";
+    if (btnDescarga) {
+        btnDescarga.href = urlQR;
+        btnDescarga.setAttribute("download", "QR-" + codigo + ".png");
+    }
 
     modal.style.display = "flex";
 }
 
 function cerrarModalQR() {
-    document.getElementById("modalVerQR").style.display = "none";
+    const modal = document.getElementById("modalVerQR");
+    if (modal) modal.style.display = "none";
 }
 
-// Impresión limpia de etiqueta con borde punteado de corte
+// Impresión formateada de etiqueta física para el frasco
 function imprimirQR() {
-    const imgUrl = document.getElementById("imgCodigoQR").src;
-    const serial = document.getElementById("qrModalSerial").innerText;
-    const reactivo = document.getElementById("qrModalReactivo").innerText;
+    const img = document.getElementById("imgCodigoQR");
+    const serial = document.getElementById("qrModalSerial")?.innerText || "";
+    const reactivo = document.getElementById("qrModalReactivo")?.innerText || "";
+    const imgUrl = img ? img.src : "";
+
     const ventana = window.open('', '_blank');
-    ventana.document.write('<html><head><title>Imprimir Etiqueta - ' + serial + '</title><style>body{display:flex;flex-direction:column;align-items:center;justify-content:center;height:90vh;font-family:Arial,sans-serif;}.label-box{border:2px dashed #000;padding:16px;border-radius:8px;text-align:center;}img{width:200px;height:200px;display:block;margin:0 auto;}h2{margin:10px 0 4px;font-family:monospace;font-size:20px;}p{margin:0;font-size:14px;font-weight:bold;color:#333;}</style></head><body><div class="label-box"><img src="' + imgUrl + '" onload="window.print(); window.close();" /><h2>' + serial + '</h2><p>' + reactivo + '</p></div></body></html>');
+    ventana.document.write(`
+        <html><head><title>Imprimir Etiqueta - ${serial}</title>
+        <style>
+            body { display:flex; flex-direction:column; align-items:center; justify-content:center; height:90vh; font-family:Arial,sans-serif; margin:0; }
+            .label-box { border: 2px dashed #000; padding: 20px; border-radius: 8px; text-align: center; width: 220px; }
+            img { width: 190px; height: 190px; display: block; margin: 0 auto; }
+            h2 { margin: 10px 0 4px; font-family: monospace; font-size: 18px; }
+            p { margin: 0; font-size: 13px; font-weight: bold; color: #333; }
+        </style></head><body>
+            <div class="label-box">
+                <img src="${imgUrl}" onload="window.print(); window.close();" />
+                <h2>${serial}</h2>
+                <p>${reactivo}</p>
+            </div>
+        </body></html>
+    `);
 }
 
 // Filtro en tiempo real por Nombre, CAS o Fórmula
@@ -224,76 +250,12 @@ function filtrarTabla() {
 }
 
 // Cerrar con Escape o clic fuera
-window.addEventListener("click", (e) => {
-    const mQR = document.getElementById("modalVerQR");
-    if (e.target === mQR) cerrarModalQR();
+window.addEventListener("click", function(e) {
+    const modal = document.getElementById("modalVerQR");
+    if (e.target === modal) cerrarModalQR();
 });
-window.addEventListener("keydown", (e) => {
+window.addEventListener("keydown", function(e) {
     if (e.key === "Escape") cerrarModalQR();
 });
-</script>
-<!-- Librería para dibujar QRs en el cliente -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-<script>
-let qrGenerator = null;
-
-function abrirModalQR(codigo, nombre, cas) {
-    const modal = document.getElementById("modalVerQR");
-    const img = document.getElementById("imgCodigoQR");
-    const serial = document.getElementById("qrModalSerial");
-    const reactivo = document.getElementById("qrModalReactivo");
-    const btnDescarga = document.getElementById("btnDescargaDirecta");
-
-    // Apuntar a la ruta que genera el archivo PNG en el backend
-    const urlQR = `/qr/${codigo}.png`;
-    img.src = urlQR;
-    serial.innerText = codigo;
-    reactivo.innerText = `${nombre} (CAS: ${cas})`;
-    btnDescarga.href = urlQR;
-    btnDescarga.setAttribute("download", `Etiqueta-${codigo}.png`);
-
-    modal.style.display = "flex";
-}
-
-    // Configurar enlace de descarga de la imagen generada
-    setTimeout(() => {
-        const canvas = contenedor.querySelector("canvas");
-        const btnDescarga = document.getElementById("btnDescargaDirecta");
-        if (canvas && btnDescarga) {
-            btnDescarga.href = canvas.toDataURL("image/png");
-            btnDescarga.setAttribute("download", "QR-" + codigo + ".png");
-        }
-    }, 100);
-
-    modal.style.display = "flex";
-}
-
-function cerrarModalQR() {
-    document.getElementById("modalVerQR").style.display = "none";
-}
-
-function imprimirQR() {
-    const imgUrl = document.getElementById("imgCodigoQR").src;
-    const serial = document.getElementById("qrModalSerial").innerText;
-    const reactivo = document.getElementById("qrModalReactivo").innerText;
-    const ventana = window.open('', '_blank');
-    ventana.document.write(`
-        <html><head><title>Imprimir Etiqueta - ${serial}</title>
-        <style>
-            body { display:flex; flex-direction:column; align-items:center; justify-content:center; height:90vh; font-family:Arial,sans-serif; }
-            .label-box { border: 2px dashed #000; padding: 20px; border-radius: 8px; text-align: center; }
-            img { width: 200px; height: 200px; display: block; margin: 0 auto; }
-            h2 { margin: 10px 0 4px; font-family: monospace; font-size: 20px; }
-            p { margin: 0; font-size: 14px; font-weight: bold; color: #333; }
-        </style></head><body>
-            <div class="label-box">
-                <img src="${imgUrl}" onload="window.print(); window.close();" />
-                <h2>${serial}</h2>
-                <p>${reactivo}</p>
-            </div>
-        </body></html>
-    `);
-}
 </script>
 {% endblock %}
