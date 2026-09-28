@@ -64,7 +64,7 @@
                         <!-- Columna de Peligrosidad como enlace a la Hoja de Seguridad (FDS) -->
 <td>
     <!-- Enlace a PubChem mediante el CAS; si el reactivo tuviera una URL propia asignada, la prioriza -->
-    <a href="{{ r.hoja_seguridad_url if r.hoja_seguridad_url else 'https://pubchem.ncbi.nlm.nih.gov/#query=' ~ r.cas }}" 
+    <a href="{{ r.hoja_seguridad_url if r.hoja_seguridad_url else '[https://www.google.com/search?q=Hoja+de+datos+de+seguridad+FDS+CAS](https://www.google.com/search?q=Hoja+de+datos+de+seguridad+FDS+CAS)+' ~ r.cas ~ '+filetype:pdf'' ~ r.cas }}" 
        target="_blank" 
        rel="noopener noreferrer" 
        class="hazard-link" 
