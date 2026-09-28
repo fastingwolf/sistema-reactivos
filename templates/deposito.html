@@ -145,7 +145,7 @@
                     <th>REACTIVO</th>
                     <th>CANTIDAD SALIDA</th>
                     <th>FRASCO / QR</th>
-                    <th>UBICACIÓN EN DEPÓSITO</th>
+                    <th>LABORATORIO DESTINO</th>
                     <th>ESTADO</th>
                 </tr>
             </thead>
@@ -189,8 +189,8 @@
                         </td>
                         <td>
                             <div class="location-cell">
-                                <i class="bi bi-geo-alt-fill text-primary"></i>
-                                <span>{{ d.contenedor.ubicacion if (d.contenedor and d.contenedor.ubicacion) else 'Depósito Central' }}</span>
+                                <i class="bi bi-flask text-primary"></i>
+                                <strong>{{ s.laboratorio_destino if s.laboratorio_destino else 'Laboratorio general' }}</strong>
                             </div>
                         </td>
                         <td>
