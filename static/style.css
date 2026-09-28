@@ -1841,3 +1841,25 @@ body {
     border: 1px solid #fecaca;
     font-weight: 600;
 }
+
+/* Evitar que el número CAS se divida en dos líneas */
+.auth-code-badge, .col-cas span {
+    white-space: nowrap !important;
+    display: inline-block;
+}
+
+/* Evitar que el código del contenedor CNT-XXXXXXXX se divida */
+.container-badge-pill {
+    white-space: nowrap !important;
+    display: inline-flex;
+    align-items: center;
+}
+
+.container-serial {
+    white-space: nowrap !important;
+}
+
+/* Asegurar que la celda de stock no se rompa */
+.stock-badge {
+    white-space: nowrap !important;
+}
