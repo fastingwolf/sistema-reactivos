@@ -1812,3 +1812,32 @@ body {
     width: 100%;
     justify-content: center;
 }
+
+/* --- Badges de Stock Disponible --- */
+.stock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.stock-available {
+    background-color: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.stock-available strong {
+    font-size: 0.92rem;
+    color: #047857;
+}
+
+.stock-empty {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    font-weight: 600;
+}

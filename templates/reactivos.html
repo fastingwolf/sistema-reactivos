@@ -41,6 +41,7 @@
                         <th>NOMBRE</th>
                         <th>N° CAS</th>
                         <th>FÓRMULA</th>
+                        <th>STOCK</th>
                         <th>UNIDAD</th>
                         <th>PELIGROSIDAD</th>
                         <th>CONTENEDORES & QR</th>
@@ -63,8 +64,28 @@
                                 <span class="text-muted">—</span>
                             {% endif %}
                         </td>
+                        <!-- Stock Disponible acumulado de frascos activos -->
                         <td>
-                            <span class="unit-text">{{ r.unidad }}</span>
+                            {% set total_stock = namespace(valor=0) %}
+                            {% if r.contenedores %}
+                                {% for c in r.contenedores %}
+                                    {% if c.activo and c.cantidad_actual is not none %}
+                                        {% set total_stock.valor = total_stock.valor + c.cantidad_actual %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if total_stock.valor > 0 %}
+                                <span class="stock-badge stock-available" title="Existencia física total en depósito">
+                                    <i class="bi bi-box-seam-fill"></i>
+                                    <strong>{{ "%.2f"|format(total_stock.valor)|replace('.00', '') }}</strong> {{ r.unidad }}
+                                </span>
+                            {% else %}
+                                <span class="stock-badge stock-empty" title="Sin existencias disponibles">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                    <span>Agotado</span>
+                                </span>
+                            {% endif %}
                         </td>
                         <!-- Peligrosidad: Enlace directo a la Hoja de Seguridad química oficial (PubChem LCSS) -->
                         <td>
